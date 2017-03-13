@@ -34,7 +34,7 @@ ros::Publisher pub, dist_pub, minx_pub, maxx_pub, miny_pub, z_pub, y_pub, x_pub,
 
 int j = 0;
 
-void get_distance(const pcl::PointCloud<pcl::PointXYZ>::ConstPtr& msg, int counter){
+void get_distance(const pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr& msg, int counter){
   double minDistance[3] = {std::numeric_limits<double>::infinity(), std::numeric_limits<double>::infinity(), std::numeric_limits<double>::infinity()};
   double min_angle_radx[3] = {std::numeric_limits<double>::infinity(), std::numeric_limits<double>::infinity(), std::numeric_limits<double>::infinity()};
   double max_angle_radx[3] = {0.0, 0.0, 0.0};
@@ -42,7 +42,7 @@ void get_distance(const pcl::PointCloud<pcl::PointXYZ>::ConstPtr& msg, int count
   int count=0;
   // int i = 0;
   // Angles are calculated in radians and can convert to degree by multpying it with 180/pi 
-  BOOST_FOREACH (const pcl::PointXYZ& pt, msg->points){//to iterate trough all the points in the filtered point cloud published by publisher
+  BOOST_FOREACH (const pcl::PointXYZRGB& pt, msg->points){//to iterate trough all the points in the filtered point cloud published by publisher
     // std::cout<<i++<<endl;
     if(hypot(pt.z, pt.x) < minDistance[0]){
       // keep updating the minimum Distant point
@@ -94,20 +94,20 @@ void
 cloud_cb (const sensor_msgs::PointCloud2ConstPtr& input)
 {
   
-  pcl::PointCloud<pcl::PointXYZ>::Ptr cloud_f (new pcl::PointCloud<pcl::PointXYZ>);
+  pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud_f (new pcl::PointCloud<pcl::PointXYZRGB>);
   
   pcl::PCLPointCloud2* cloud_blob = new pcl::PCLPointCloud2; 
   pcl::PCLPointCloud2ConstPtr cloudPtr(cloud_blob);
   pcl::PCLPointCloud2 cloud_filtered_blob;
 
-  pcl::PointCloud<pcl::PointXYZ>::Ptr cloud_filtered_planar (new pcl::PointCloud<pcl::PointXYZ>);
+  pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud_filtered_planar (new pcl::PointCloud<pcl::PointXYZRGB>);
 
   pcl_conversions::toPCL(*input, *cloud_blob);
 
   
 
   
-  pcl::PointCloud<pcl::PointXYZ>::Ptr cloud_filtered (new pcl::PointCloud<pcl::PointXYZ>);
+  pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud_filtered (new pcl::PointCloud<pcl::PointXYZRGB>);
   // Perform the actual filtering
   pcl::VoxelGrid<pcl::PCLPointCloud2> sor;
   sor.setInputCloud (cloudPtr);
@@ -117,10 +117,10 @@ cloud_cb (const sensor_msgs::PointCloud2ConstPtr& input)
   pcl::fromPCLPointCloud2 (cloud_filtered_blob, *cloud_filtered);
 
   // Create the segmentation object for the planar model and set all the parameters
-  pcl::SACSegmentation<pcl::PointXYZ> seg;
+  pcl::SACSegmentation<pcl::PointXYZRGB> seg;
   pcl::PointIndices::Ptr inliers (new pcl::PointIndices);
   pcl::ModelCoefficients::Ptr coefficients (new pcl::ModelCoefficients);
-  pcl::PointCloud<pcl::PointXYZ>::Ptr cloud_plane (new pcl::PointCloud<pcl::PointXYZ> ());
+  pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud_plane (new pcl::PointCloud<pcl::PointXYZRGB> ());
   pcl::PCDWriter writer;
   seg.setOptimizeCoefficients (true);
   seg.setModelType (pcl::SACMODEL_PLANE);
@@ -141,7 +141,7 @@ cloud_cb (const sensor_msgs::PointCloud2ConstPtr& input)
     }
 
     // Extract the planar inliers from the input cloud
-    pcl::ExtractIndices<pcl::PointXYZ> extract;
+    pcl::ExtractIndices<pcl::PointXYZRGB> extract;
     extract.setInputCloud (cloud_filtered);
     extract.setIndices (inliers);
     // Remove the planar inliers, extract the rest
@@ -151,11 +151,11 @@ cloud_cb (const sensor_msgs::PointCloud2ConstPtr& input)
   }
 
   // Creating the KdTree object for the search method of the extraction
-  pcl::search::KdTree<pcl::PointXYZ>::Ptr tree (new pcl::search::KdTree<pcl::PointXYZ>);
+  pcl::search::KdTree<pcl::PointXYZRGB>::Ptr tree (new pcl::search::KdTree<pcl::PointXYZRGB>);
   tree->setInputCloud (cloud_filtered);
 
   std::vector<pcl::PointIndices> cluster_indices;
-  pcl::EuclideanClusterExtraction<pcl::PointXYZ> ec;
+  pcl::EuclideanClusterExtraction<pcl::PointXYZRGB> ec;
   ec.setClusterTolerance (0.05);
   ec.setMinClusterSize (100);
   ec.setMaxClusterSize (25000);
@@ -163,22 +163,36 @@ cloud_cb (const sensor_msgs::PointCloud2ConstPtr& input)
   ec.setInputCloud (cloud_filtered);
   ec.extract (cluster_indices);
 
-  pcl::PointCloud<pcl::PointXYZ>::Ptr cloud_clust_remove (new pcl::PointCloud<pcl::PointXYZ>);
+  pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud_clust_remove (new pcl::PointCloud<pcl::PointXYZRGB>);
   pcl::PCLPointCloud2 cloud_final;
   pcl::PCLPointCloud2 temp;
   *cloud_clust_remove = *cloud_filtered;
+  pcl::PointCloud<pcl::PointXYZRGB> cloud_xyzrgb;
   for (int it = 0; it < cluster_indices.size(); ++it)
   {
 
     // Extract the planar inliers from the input cloud
-    pcl::ExtractIndices<pcl::PointXYZ> ext;
+    pcl::ExtractIndices<pcl::PointXYZRGB> ext;
     ext.setInputCloud (cloud_clust_remove);
     ext.setIndices(boost::shared_ptr<pcl::PointIndices> (new pcl::PointIndices(cluster_indices[it])));
     ext.setNegative (false);
     ext.filter (*cloud_f);
     get_distance(cloud_f, j++);
-    
-    pcl::toPCLPointCloud2 (*cloud_f, temp);
+    cloud_xyzrgb = *cloud_f;
+
+    for (size_t i = 0; i < cloud_xyzrgb.points.size(); i++) {
+      if (it % 3 == 0) {
+        cloud_xyzrgb.points[i].r = 255;
+      }
+      else if (it % 3 == 1) {
+        cloud_xyzrgb.points[i].g = 255;
+      }
+      else if (it % 3 == 2) {
+        cloud_xyzrgb.points[i].b = 255;  
+      }
+    }
+
+    pcl::toPCLPointCloud2 (cloud_xyzrgb, temp);
     pcl::concatenatePointCloud(cloud_final, temp, cloud_final);
   }
   pub.publish (cloud_final);

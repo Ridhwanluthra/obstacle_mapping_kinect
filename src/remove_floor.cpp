@@ -68,10 +68,15 @@ void callback (const sensor_msgs::PointCloud2ConstPtr& input) {
   // set setNegative to true to get outliers
   extract.setNegative(true);
   extract.filter(*cloud_f);
+  pcl::PointCloud<pcl::PointXYZRGB> cloud_xyzrgb = *cloud_f;
+
+  for (size_t i = 0; i < cloud_xyzrgb.points.size(); i++) {
+    cloud_xyzrgb.points[i].r = 255;
+  }
 
   // Publish the plane to a new topic.
   pcl::PCLPointCloud2 outcloud;
-  pcl::toPCLPointCloud2 (*cloud_f, outcloud);
+  pcl::toPCLPointCloud2 (cloud_xyzrgb, outcloud);
   pub.publish (outcloud);
 }
 
