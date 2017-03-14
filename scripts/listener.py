@@ -16,7 +16,7 @@ def callback(data):
 
 	width = (angle_right[0] * math.cos(abs((math.pi/4) - angle_right[1]))) + (angle_left[0] * math.cos(abs((math.pi/4) - angle_left[1])))
 
-	r = requests.post("http://www.lithics.in/apis/send_firebase_message.php", data={'minDistance':width})
+	r = requests.post("http://www.lithics.in/apis/send_firebase_message.php", data={'message':width})
 
 def listener():
 	# In ROS, nodes are uniquely named. If two nodes with the same
