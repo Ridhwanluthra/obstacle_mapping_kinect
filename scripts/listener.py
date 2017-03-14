@@ -15,8 +15,14 @@ import requests
 import math
 from time import sleep
 
-curr_frame = int()
+curr_frame = 0
 data_per_frame = list()
+prev_frame = 0
+
+sentence = ""
+width = list()
+angle = list()
+direction = list()
 
 '''
 *
@@ -28,7 +34,12 @@ data_per_frame = list()
 *
 '''
 def callback(data):
-	global curr_frame, data_per_frame
+	global curr_frame, data_per_frame, sentence, width, angle, direction
+	rospy.loginfo("Data.data")
+	rospy.loginfo(data.data)
+
+	
+	rospy.loginfo("Data[0]")
 	rospy.loginfo(data.data[0])
 
 	# unpacking the data
@@ -36,17 +47,17 @@ def callback(data):
 	angle_right = data.data[4:7]
 	angle_left = data.data[7:10]
 
-	rospy.loginfo(min_dist)
-	rospy.loginfo(angle_left)
-	rospy.loginfo(angle_right)
-	
-	width = list()
-	angle = list()
-	direction = list()
-
 	if curr_frame == data.data[0]:
 		data_per_frame.append(data.data)
 	else:
+                                sentence = ""
+		for i in range(len(width)):
+			sentence += "there is a " + str(int(width[i])) + "meter wide object towards your " + direction[i] + "at an angle of " + str(abs(angle[i] * (180 / math.pi))) + "and"
+		sentence = sentence[:-4]
+		r = requests.post("http://www.lithics.in/apis/eyic/firebase.php", data={'message':sentence})
+		width = list()
+                                angle = list()
+                                direction = list()
 		for dat in data_per_frame:
 			min_dist = dat[1:4]
 			angle_right = dat[4:7]
@@ -55,13 +66,9 @@ def callback(data):
 			width.append((angle_right[0] * math.cos(abs((math.pi/4) - angle_right[1]))) + (angle_left[0] * math.cos(abs((math.pi/4) - angle_left[1]))))
 			angle.append((math.pi/4) - min_dist[1])
 			direction.append("right" if angle[-1] < 0 else "left")
-		sentence = ""
-		for i in range(len(width)):
-			sentence += "there is a " + str(int(width[0])) + "meter wide object towards your " + direction[i] + "at an angle of " + abs(angle[i] * (180 / math.pi)) + "and"
-		sentence = sentence[:-4]
-	curr_frame = data.data[0]
-	r = requests.post("http://www.lithics.in/apis/send_firebase_message.php", data={'message':sentence})
-	sleep(15)
+		curr_frame = data.data[0]
+	
+
 '''
 *
 * Function Name: 	listener
