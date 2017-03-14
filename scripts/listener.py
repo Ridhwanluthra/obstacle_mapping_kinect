@@ -1,4 +1,14 @@
 #!/usr/bin/env python
+
+'''
+*
+* project name: 	visual perception for visually impaired	
+* author list: 
+* filename: 		listener.py
+* functions: 		callback, listener
+* global variables: curr_frame, data_per_frame, check
+*
+'''
 import rospy
 from std_msgs.msg import String, Float64MultiArray, MultiArrayLayout, MultiArrayDimension
 import requests
@@ -9,6 +19,16 @@ curr_frame = int()
 data_per_frame = list()
 check = True
 
+
+'''
+*
+* Function Name: 	callback
+* Input: 		data -> data about the point cloud
+* Output: 		
+* Logic: 		
+* Example Call:	 callback function, manual calling not required.
+*
+'''
 def callback(data):
 	global curr_frame, data_per_frame, check
 	rospy.loginfo(data.data[0])
@@ -43,7 +63,15 @@ def callback(data):
 		check = False
 	check = False
 	sleep(30)
-
+'''
+*
+* Function Name: 	listener
+* Input: 		NIL
+* Output: 		
+* Logic: 	Initializes node and makes sure that two nodes don't have the same name	
+* Example Call:	 
+*
+'''
 def listener():
 	# In ROS, nodes are uniquely named. If two nodes with the same
 	# node are launched, the previous one is kicked off. The
