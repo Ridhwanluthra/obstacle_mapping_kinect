@@ -34,11 +34,65 @@ ros::Publisher pub, dist_pub, minx_pub, maxx_pub, miny_pub, z_pub, y_pub, x_pub,
 
 int j = 0;
 
+// void get_distance(const pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr& msg, int counter){
+//   double minDistance[3] = {std::numeric_limits<double>::infinity(), std::numeric_limits<double>::infinity(), std::numeric_limits<double>::infinity()};
+//   double min_angle_radx[3] = {std::numeric_limits<double>::infinity(), std::numeric_limits<double>::infinity(), std::numeric_limits<double>::infinity()};
+//   double max_angle_radx[3] = {0.0, 0.0, 0.0};
+//   double min_angle_rady[3] = {0.0, 0.0, 0.0};
+//   int count=0;
+//   // int i = 0;
+//   // Angles are calculated in radians and can convert to degree by multpying it with 180/pi 
+//   BOOST_FOREACH (const pcl::PointXYZRGB& pt, msg->points){//to iterate trough all the points in the filtered point cloud published by publisher
+//     // std::cout<<i++<<endl;
+//     if(hypot(pt.z, pt.x) < minDistance[0]){
+//       // keep updating the minimum Distant point
+//       minDistance[0] = hypot(pt.z, pt.x);
+//       min_angle_radx[0] = atan2(pt.z,pt.x);
+//       max_angle_radx[0] = atan2(pt.z,pt.x);
+//       min_angle_rady[0] = atan2(pt.z, pt.y);
+//     }
+//     if(atan2(pt.z, pt.x) < min_angle_radx[1]){
+//       // keep updating the minimum Distant point
+//       minDistance[1] = hypot(pt.z, pt.x);
+//       min_angle_radx[1] = atan2(pt.z,pt.x);
+//       max_angle_radx[1] = atan2(pt.z,pt.x);
+//       min_angle_rady[1] = atan2(pt.z, pt.y);
+//     }
+//     else if(atan2(pt.z, pt.x) > max_angle_radx[2]){
+//       // keep updating the minimum Distant point
+//       minDistance[2] = hypot(pt.z, pt.x);
+//       min_angle_radx[2] = atan2(pt.z,pt.x);
+//       max_angle_radx[2] = atan2(pt.z,pt.x);
+//       min_angle_rady[2] = atan2(pt.z, pt.y);
+//     }
+//   }
+//   std_msgs::Float64MultiArray arr;
+
+//   arr.data.clear();
+//   arr.data.push_back(counter);
+//   for (int i = 0; i <3; i++)
+//     arr.data.push_back(minDistance[i]);
+//   for (int i = 0; i <3; i++)
+//     arr.data.push_back(min_angle_radx[i]);
+//   for (int i = 0; i <3; i++)
+//     arr.data.push_back(max_angle_radx[i]);
+//   for (int i = 0; i <3; i++)
+//     arr.data.push_back(min_angle_rady[i]);
+
+  
+//   arr_pub.publish(arr);
+//   // pub.publish(minDistance);
+//   cout<<"Distance="<<minDistance[0]<<minDistance[1]<<minDistance[2]<<"\n";
+//   cout<<"Angle in Degree X axis="<<min_angle_radx[0]*(180/3.14159265358979323846)<<min_angle_radx[1]*(180/3.14159265358979323846)<<min_angle_radx[2]*(180/3.14159265358979323846)<<"\n";
+//   cout<<"Angle in Degree Y axis="<<min_angle_rady[0]*(180/3.14159265358979323846)<<min_angle_rady[1]*(180/3.14159265358979323846)<<min_angle_rady[2]*(180/3.14159265358979323846)<<"\n";
+//  // sleep(3); //use sleep if you want to delay loop.
+// }
+
+
 void get_distance(const pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr& msg, int counter){
-  double minDistance[3] = {std::numeric_limits<double>::infinity(), std::numeric_limits<double>::infinity(), std::numeric_limits<double>::infinity()};
-  double min_angle_radx[3] = {std::numeric_limits<double>::infinity(), std::numeric_limits<double>::infinity(), std::numeric_limits<double>::infinity()};
-  double max_angle_radx[3] = {0.0, 0.0, 0.0};
-  double min_angle_rady[3] = {0.0, 0.0, 0.0};
+  double minDistance[4] = {std::numeric_limits<double>::infinity(), std::numeric_limits<double>::infinity(), std::numeric_limits<double>::infinity()};
+  double min_angle_radx[4] = {std::numeric_limits<double>::infinity(), std::numeric_limits<double>::infinity(), std::numeric_limits<double>::infinity()};
+  double max_angle_radx[4] = {0.0, 0.0, 0.0};
   int count=0;
   // int i = 0;
   // Angles are calculated in radians and can convert to degree by multpying it with 180/pi 
@@ -47,44 +101,38 @@ void get_distance(const pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr& msg, int co
     if(hypot(pt.z, pt.x) < minDistance[0]){
       // keep updating the minimum Distant point
       minDistance[0] = hypot(pt.z, pt.x);
-      min_angle_radx[0] = atan2(pt.z,pt.x);
-      max_angle_radx[0] = atan2(pt.z,pt.x);
-      min_angle_rady[0] = atan2(pt.z, pt.y);
+      minDistance[1] = atan2(pt.z,pt.x);
+      minDistance[2] = atan2(pt.z, pt.y);
     }
     if(atan2(pt.z, pt.x) < min_angle_radx[1]){
       // keep updating the minimum Distant point
-      minDistance[1] = hypot(pt.z, pt.x);
+      min_angle_radx[0] = hypot(pt.z, pt.x);
       min_angle_radx[1] = atan2(pt.z,pt.x);
-      max_angle_radx[1] = atan2(pt.z,pt.x);
-      min_angle_rady[1] = atan2(pt.z, pt.y);
+      min_angle_radx[2] = atan2(pt.z, pt.y);
     }
-    else if(atan2(pt.z, pt.x) > max_angle_radx[2]){
+    else if(atan2(pt.z, pt.x) > max_angle_radx[1]){
       // keep updating the minimum Distant point
-      minDistance[2] = hypot(pt.z, pt.x);
-      min_angle_radx[2] = atan2(pt.z,pt.x);
-      max_angle_radx[2] = atan2(pt.z,pt.x);
-      min_angle_rady[2] = atan2(pt.z, pt.y);
+      max_angle_radx[0] = hypot(pt.z, pt.x);
+      max_angle_radx[1] = atan2(pt.z,pt.x);
+      max_angle_radx[2] = atan2(pt.z, pt.y);
     }
   }
   std_msgs::Float64MultiArray arr;
 
   arr.data.clear();
   arr.data.push_back(counter);
-  for (int i = 0; i <3; i++)
+  for (int i = 0; i < 3; i++)
     arr.data.push_back(minDistance[i]);
-  for (int i = 0; i <3; i++)
+  for (int i = 0; i < 3; i++)
     arr.data.push_back(min_angle_radx[i]);
-  for (int i = 0; i <3; i++)
+  for (int i = 0; i < 3; i++)
     arr.data.push_back(max_angle_radx[i]);
-  for (int i = 0; i <3; i++)
-    arr.data.push_back(min_angle_rady[i]);
-
   
   arr_pub.publish(arr);
   // pub.publish(minDistance);
-  cout<<"Distance="<<minDistance[0]<<minDistance[1]<<minDistance[2]<<"\n";
-  cout<<"Angle in Degree X axis="<<min_angle_radx[0]*(180/3.14159265358979323846)<<min_angle_radx[1]*(180/3.14159265358979323846)<<min_angle_radx[2]*(180/3.14159265358979323846)<<"\n";
-  cout<<"Angle in Degree Y axis="<<min_angle_rady[0]*(180/3.14159265358979323846)<<min_angle_rady[1]*(180/3.14159265358979323846)<<min_angle_rady[2]*(180/3.14159265358979323846)<<"\n";
+  // cout<<"Distance="<<minDistance[0]<<minDistance[1]<<minDistance[2]<<"\n";
+  // cout<<"Angle in Degree X axis="<<min_angle_radx[0]*(180/3.14159265358979323846)<<min_angle_radx[1]*(180/3.14159265358979323846)<<min_angle_radx[2]*(180/3.14159265358979323846)<<"\n";
+  // cout<<"Angle in Degree Y axis="<<min_angle_rady[0]*(180/3.14159265358979323846)<<min_angle_rady[1]*(180/3.14159265358979323846)<<min_angle_rady[2]*(180/3.14159265358979323846)<<"\n";
  // sleep(3); //use sleep if you want to delay loop.
 }
 

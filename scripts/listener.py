@@ -1,9 +1,22 @@
 #!/usr/bin/env python
 import rospy
 from std_msgs.msg import String, Float64MultiArray, MultiArrayLayout, MultiArrayDimension
+import requests
+import math
 
 def callback(data):
-	rospy.loginfo(type(data.data))
+	rospy.loginfo(len(data.data))
+	min_dist = data.data[1:4]
+	angle_right = data.data[4:7]
+	angle_left = data.data[7:10]
+
+	rospy.loginfo(min_dist)
+	rospy.loginfo(angle_left)
+	rospy.loginfo(angle_right)
+
+	width = (angle_right[0] * math.cos(abs((math.pi/4) - angle_right[1]))) + (angle_left[0] * math.cos(abs((math.pi/4) - angle_left[1])))
+
+	r = requests.post("http://www.lithics.in/apis/send_firebase_message.php", data={'minDistance':width})
 
 def listener():
 	# In ROS, nodes are uniquely named. If two nodes with the same
