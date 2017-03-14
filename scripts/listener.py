@@ -17,8 +17,6 @@ from time import sleep
 
 curr_frame = int()
 data_per_frame = list()
-check = True
-
 
 '''
 *
@@ -30,9 +28,10 @@ check = True
 *
 '''
 def callback(data):
-	global curr_frame, data_per_frame, check
+	global curr_frame, data_per_frame
 	rospy.loginfo(data.data[0])
 
+	# unpacking the data
 	min_dist = data.data[1:4]
 	angle_right = data.data[4:7]
 	angle_left = data.data[7:10]
@@ -43,6 +42,7 @@ def callback(data):
 	
 	width = list()
 	angle = list()
+	direction = list()
 
 	if curr_frame == data.data[0]:
 		data_per_frame.append(data.data)
@@ -51,18 +51,17 @@ def callback(data):
 			min_dist = dat[1:4]
 			angle_right = dat[4:7]
 			angle_left = dat[7:10]
+			# calculates the width of the object using the angle to each of the extreme sides and their distances
 			width.append((angle_right[0] * math.cos(abs((math.pi/4) - angle_right[1]))) + (angle_left[0] * math.cos(abs((math.pi/4) - angle_left[1]))))
 			angle.append((math.pi/4) - min_dist[1])
-		print(len(width), len(angle), curr_frame, data.data[0])
-		direction0 = "right" if angle[0] < 0 else "left"
-		direction1 = "right" if angle[1] < 0 else "left"
-		sentence = "there is a " + str(int(width[0])) + "meter wide object towards your " + direction0 + "there is a "  + str(int(width[1])) + "meter wide object towards your " + direction1
-	curr_frame = data.data[0] + 1
-	if check:	
-		r = requests.post("http://www.lithics.in/apis/send_firebase_message.php", data={'message':sentence})
-		check = False
-	check = False
-	sleep(30)
+			direction.append("right" if angle[-1] < 0 else "left")
+		sentence = ""
+		for i in range(len(width)):
+			sentence += "there is a " + str(int(width[0])) + "meter wide object towards your " + direction[i] + "at an angle of " + abs(angle[i] * (180 / math.pi)) + "and"
+		sentence = sentence[:-4]
+	curr_frame = data.data[0]
+	r = requests.post("http://www.lithics.in/apis/send_firebase_message.php", data={'message':sentence})
+	sleep(15)
 '''
 *
 * Function Name: 	listener
@@ -70,7 +69,7 @@ def callback(data):
 * Output: 		NIL
 * Logic: 	Initializes node and makes sure that two nodes don't have the same name, 
 *			also subscribes to the topic and calls the callback function.
-* Example Call:	 
+* Example Call:	 listener()
 *
 '''
 def listener():
