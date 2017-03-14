@@ -1,10 +1,10 @@
 /*
 *
 * Project Name:   Visual perception for the visually impaired
-* Author List:    
+* Author List:    Pankaj Baranwal, Ridhwan Luthra, Shreyas Sachan, Shashwat Yashaswi
 * Filename:     cluster_distances.cpp
 * Functions:    get_distance, cloud_cb, main
-* Global Variables: pub, dist_pub, minx_pub, maxx_pub, minu_pub, z_pub, y_pub, x_pub, arr_pub, j
+* Global Variables: pub, arr_pub, j
 *
 */
 #include <ros/ros.h>
@@ -39,72 +39,19 @@
 
 using namespace::std;
 
-ros::Publisher pub, dist_pub, minx_pub, maxx_pub, miny_pub, z_pub, y_pub, x_pub, arr_pub;
+ros::Publisher pub, arr_pub;
 
 int j = 0;
-
-// void get_distance(const pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr& msg, int counter){
-//   double minDistance[3] = {std::numeric_limits<double>::infinity(), std::numeric_limits<double>::infinity(), std::numeric_limits<double>::infinity()};
-//   double min_angle_radx[3] = {std::numeric_limits<double>::infinity(), std::numeric_limits<double>::infinity(), std::numeric_limits<double>::infinity()};
-//   double max_angle_radx[3] = {0.0, 0.0, 0.0};
-//   double min_angle_rady[3] = {0.0, 0.0, 0.0};
-//   int count=0;
-//   // int i = 0;
-//   // Angles are calculated in radians and can convert to degree by multpying it with 180/pi 
-//   BOOST_FOREACH (const pcl::PointXYZRGB& pt, msg->points){//to iterate trough all the points in the filtered point cloud published by publisher
-//     // std::cout<<i++<<endl;
-//     if(hypot(pt.z, pt.x) < minDistance[0]){
-//       // keep updating the minimum Distant point
-//       minDistance[0] = hypot(pt.z, pt.x);
-//       min_angle_radx[0] = atan2(pt.z,pt.x);
-//       max_angle_radx[0] = atan2(pt.z,pt.x);
-//       min_angle_rady[0] = atan2(pt.z, pt.y);
-//     }
-//     if(atan2(pt.z, pt.x) < min_angle_radx[1]){
-//       // keep updating the minimum Distant point
-//       minDistance[1] = hypot(pt.z, pt.x);
-//       min_angle_radx[1] = atan2(pt.z,pt.x);
-//       max_angle_radx[1] = atan2(pt.z,pt.x);
-//       min_angle_rady[1] = atan2(pt.z, pt.y);
-//     }
-//     else if(atan2(pt.z, pt.x) > max_angle_radx[2]){
-//       // keep updating the minimum Distant point
-//       minDistance[2] = hypot(pt.z, pt.x);
-//       min_angle_radx[2] = atan2(pt.z,pt.x);
-//       max_angle_radx[2] = atan2(pt.z,pt.x);
-//       min_angle_rady[2] = atan2(pt.z, pt.y);
-//     }
-//   }
-//   std_msgs::Float64MultiArray arr;
-
-//   arr.data.clear();
-//   arr.data.push_back(counter);
-//   for (int i = 0; i <3; i++)
-//     arr.data.push_back(minDistance[i]);
-//   for (int i = 0; i <3; i++)
-//     arr.data.push_back(min_angle_radx[i]);
-//   for (int i = 0; i <3; i++)
-//     arr.data.push_back(max_angle_radx[i]);
-//   for (int i = 0; i <3; i++)
-//     arr.data.push_back(min_angle_rady[i]);
-
-  
-//   arr_pub.publish(arr);
-//   // pub.publish(minDistance);
-//   cout<<"Distance="<<minDistance[0]<<minDistance[1]<<minDistance[2]<<"\n";
-//   cout<<"Angle in Degree X axis="<<min_angle_radx[0]*(180/3.14159265358979323846)<<min_angle_radx[1]*(180/3.14159265358979323846)<<min_angle_radx[2]*(180/3.14159265358979323846)<<"\n";
-//   cout<<"Angle in Degree Y axis="<<min_angle_rady[0]*(180/3.14159265358979323846)<<min_angle_rady[1]*(180/3.14159265358979323846)<<min_angle_rady[2]*(180/3.14159265358979323846)<<"\n";
-//  // sleep(3); //use sleep if you want to delay loop.
-// }
 
 double get_distance(const pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr& msg, int counter){
 /*
 *
 * Function Name:  get_distance
 * Input:    msg -> stores point cloud information to be processed
-            counter -> [NOT_SURE] 
+            counter -> maintains the frame in consideration, necessary to handle clusters of same frame. 
 * Output:    Publishes the minimum distance to ROS publisher
-* Logic:    Iterates through all points in the filtered point cloud and publishes the point that is the closest.
+* Logic:    Iterates through all points in the filtered point cloud and publishes the min distance,
+*           its angles, its leftmost points distance and angles, its rightmost points distance and angles
 * Example Call:  get_distance (cloud, j)
 *
 */
@@ -123,13 +70,13 @@ double get_distance(const pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr& msg, int 
       minDistance[2] = atan2(pt.z, pt.y);
     }
     if(atan2(pt.z, pt.x) < min_angle_radx[1]){
-      // keep updating the minimum Distant point
+      // keep updating the minimum angle
       min_angle_radx[0] = hypot(pt.z, pt.x);
       min_angle_radx[1] = atan2(pt.z,pt.x);
       min_angle_radx[2] = atan2(pt.z, pt.y);
     }
     else if(atan2(pt.z, pt.x) > max_angle_radx[1]){
-      // keep updating the minimum Distant point
+      // keep updating the maximum angle
       max_angle_radx[0] = hypot(pt.z, pt.x);
       max_angle_radx[1] = atan2(pt.z,pt.x);
       max_angle_radx[2] = atan2(pt.z, pt.y);
@@ -138,6 +85,7 @@ double get_distance(const pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr& msg, int 
   std_msgs::Float64MultiArray arr;
 
   arr.data.clear();
+  // serialising for publishing
   arr.data.push_back(counter);
   for (int i = 0; i < 3; i++)
     arr.data.push_back(minDistance[i]);
@@ -148,11 +96,6 @@ double get_distance(const pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr& msg, int 
   
   arr_pub.publish(arr);
   return minDistance[0];
-  // pub.publish(minDistance);
-  // cout<<"Distance="<<minDistance[0]<<minDistance[1]<<minDistance[2]<<"\n";
-  // cout<<"Angle in Degree X axis="<<min_angle_radx[0]*(180/3.14159265358979323846)<<min_angle_radx[1]*(180/3.14159265358979323846)<<min_angle_radx[2]*(180/3.14159265358979323846)<<"\n";
-  // cout<<"Angle in Degree Y axis="<<min_angle_rady[0]*(180/3.14159265358979323846)<<min_angle_rady[1]*(180/3.14159265358979323846)<<min_angle_rady[2]*(180/3.14159265358979323846)<<"\n";
- // sleep(3); //use sleep if you want to delay loop.
 }
 
 
@@ -161,8 +104,14 @@ double get_distance(const pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr& msg, int 
 *
 * Function Name:  cloud_cb
 * Input:    input -> A point cloud to work on 
-* Output:   Publishes the segmented point cloud 
-* Logic:    Filters the point cloud and segments it 
+* Output:   Publishes the clustered point cloud and the distances of them.
+* Logic:    first a voxelgrid filter is applied to make the cloud less dense.
+*           then Sac segmentation is done using ransac model to extract the planes
+*           Then using extractIndices the point cloud without the floor plane is extracted.
+*           then eucledian clustering is executed to find clusters
+*           the various clusters are then concatinated and then published, this also removes outliers
+*           for each cluster the teh get_distance() function is called which produces useful information
+*           about each of the clusters.
 * Example Call: Callback function. Manual calling not required 
 *
 */
@@ -252,16 +201,18 @@ cloud_cb (const sensor_msgs::PointCloud2ConstPtr& input)
     pcl::ExtractIndices<pcl::PointXYZRGB> ext;
     ext.setInputCloud (cloud_clust_remove);
     ext.setIndices(boost::shared_ptr<pcl::PointIndices> (new pcl::PointIndices(cluster_indices[it])));
+    // to extract just the cluster
     ext.setNegative (false);
     ext.filter (*cloud_f);
     range = get_distance(cloud_f, j);
     std::cout<<range<<std::endl;
-	ROS_INFO_STREAM(range);
+    // to ignore far away clusters for brevity.
     if (range >= 3.5){
       continue;
     }
     cloud_xyzrgb = *cloud_f;
 
+    // iteratively colors the cluster red, green or blue.
     for (size_t i = 0; i < cloud_xyzrgb.points.size(); i++) {
       if (it % 3 == 0) {
         cloud_xyzrgb.points[i].r = 255;

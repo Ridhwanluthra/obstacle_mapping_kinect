@@ -1,3 +1,5 @@
+// We have adapted this code from the below mentioned auther
+
 /*
 *author: Abhi alias Faize. 
 *email: info@aiinspired.com
@@ -40,7 +42,7 @@
 /*
 *
 * Project Name:   Visual perception for the visually impaired
-* Author List:     
+* Author List:     Pankaj Baranwal, Ridhwan Luthra, Shreyas Sachan, Shashwat Yashaswi
 * Filename:     find_min_distance.cpp
 * Functions:    callback, main 
 * Global Variables: N.A.
@@ -63,7 +65,7 @@ using namespace::std;
 * function name: callback
 * input:  msg -> a point cloud data to be worked on 
 * output: finds the minimum distance in the point cloud  
-* logic:   
+* logic:   explained clearly above
 * example call: callback function. manual calling not required.
 *
 */

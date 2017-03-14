@@ -3,7 +3,7 @@
 '''
 *
 * project name: 	visual perception for visually impaired	
-* author list: 
+* author list:      Pankaj Baranwal, Ridhwan Luthra, Shreyas Sachan, Shashwat Yashaswi
 * filename: 		listener.py
 * functions: 		callback, listener
 * global variables: curr_frame, data_per_frame, check
@@ -67,8 +67,9 @@ def callback(data):
 *
 * Function Name: 	listener
 * Input: 		NIL
-* Output: 		
-* Logic: 	Initializes node and makes sure that two nodes don't have the same name	
+* Output: 		NIL
+* Logic: 	Initializes node and makes sure that two nodes don't have the same name, 
+*			also subscribes to the topic and calls the callback function.
 * Example Call:	 
 *
 '''
@@ -83,5 +84,6 @@ def listener():
 	# spin() simply keeps python from exiting until this node is stopped
 	rospy.spin()
 
+# runs the listener function if the file is run as a script
 if __name__ == '__main__':
 	listener()

@@ -1,7 +1,7 @@
 /*
 *
 * Project Name:   Visual perception for the visually impaired
-* Author List:    
+* Author List:    Pankaj Baranwal, Ridhwan Luthra, Shreyas Sachan, Shashwat Yashaswi
 * Filename:     cluster_extraction.cpp
 * Functions:    cloud_cb, main 
 * Global Variables: pub -> Ros publisher
@@ -36,14 +36,18 @@ ros::Publisher pub;
 * Function Name: cloud_cb
 * Input: input -> A ros message service that provides point cloud data from kinect
 * Output:  Publishes extracted cluster. 
-* Logic:   
+* Logic:   first a voxelgrid filter is applied to make the cloud less dense.
+*          then Sac segmentation is done using ransac model to extract the planes
+*          Then using extractIndices the point cloud without the floor plane is extracted.
+*          then eucledian clustering is executed to find clusters
+*          the various clusters are then concatinated and then published, this also removes outliers
 * Example Call: Callback function. Manual calling not required. 
 *
 */
 void 
 cloud_cb (const sensor_msgs::PointCloud2ConstPtr& input)
 {
-  
+  //variable declarations
   pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud_f (new pcl::PointCloud<pcl::PointXYZRGB>);
   
   pcl::PCLPointCloud2* cloud_blob = new pcl::PCLPointCloud2; 
@@ -53,7 +57,8 @@ cloud_cb (const sensor_msgs::PointCloud2ConstPtr& input)
   pcl_conversions::toPCL(*input, *cloud_blob);
 
   pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud_filtered (new pcl::PointCloud<pcl::PointXYZRGB>);
-  // Perform the actual filtering
+  // this is the voxel grid filtering
+  // Create the filtering object: downsample the dataset using a leaf size of 1cm
   pcl::VoxelGrid<pcl::PCLPointCloud2> sor;
   sor.setInputCloud (cloudPtr);
   sor.setLeafSize (0.05, 0.05, 0.05);
@@ -66,7 +71,6 @@ cloud_cb (const sensor_msgs::PointCloud2ConstPtr& input)
   pcl::PointIndices::Ptr inliers (new pcl::PointIndices);
   pcl::ModelCoefficients::Ptr coefficients (new pcl::ModelCoefficients);
   pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud_plane (new pcl::PointCloud<pcl::PointXYZRGB> ());
-  pcl::PCDWriter writer;
   seg.setOptimizeCoefficients (true);
   seg.setModelType (pcl::SACMODEL_PLANE);
   seg.setMethodType (pcl::SAC_RANSAC);
@@ -105,6 +109,7 @@ cloud_cb (const sensor_msgs::PointCloud2ConstPtr& input)
   pcl::search::KdTree<pcl::PointXYZRGB>::Ptr tree (new pcl::search::KdTree<pcl::PointXYZRGB>);
   tree->setInputCloud (cloud_filtered);
 
+  // create object and set params for clustering
   std::vector<pcl::PointIndices> cluster_indices;
   pcl::EuclideanClusterExtraction<pcl::PointXYZRGB> ec;
   ec.setClusterTolerance (0.05); // 2cm
