@@ -18,11 +18,11 @@ public class MyFirebaseInstanceIDService extends FirebaseInstanceIdService {
 
     /*
     *
-    * Function Name: 	<Function Name>
-    * Input: 		<Inputs (or Parameters) list with description if any>
-    * Output: 		<Return value with description if any>
-    * Logic: 		<Description of the function performed and the logic used in the function>
-    * Example Call:		<Example of how to call this function>
+    * Function Name: 	<onOptionsItemSelected>
+    * Input: 		<Overridden function>
+    * Output: 		<Overridden function>
+    * Logic: 		<Overridden function>
+    * Example Call:		<System makes automatic calls>
     *
     */
 

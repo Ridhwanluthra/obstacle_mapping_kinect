@@ -52,11 +52,11 @@ public class MainActivity extends AppCompatActivity {
 
    /*
     *
-    * Function Name: 	<Function Name>
-    * Input: 		<Inputs (or Parameters) list with description if any>
-    * Output: 		<Return value with description if any>
-    * Logic: 		<Description of the function performed and the logic used in the function>
-    * Example Call:		<Example of how to call this function>
+    * Function Name: 	<onCreate>
+    * Input: 		<Bundle savedInstanceState(For saving and retrieving data)>
+    * Output: 		<void>
+    * Logic: 		<Equivalent to 'main' function in JAVA>
+    * Example Call:		<Called automatically by OS>
     *
     */
 
@@ -87,11 +87,11 @@ public class MainActivity extends AppCompatActivity {
 
     /*
     *
-    * Function Name: 	<Function Name>
-    * Input: 		<Inputs (or Parameters) list with description if any>
-    * Output: 		<Return value with description if any>
-    * Logic: 		<Description of the function performed and the logic used in the function>
-    * Example Call:		<Example of how to call this function>
+    * Function Name: 	<ttsUnder20>
+    * Input: 		<String text(Text to be spoken)>
+    * Output: 		<void>
+    * Logic: 		<Function calls the necessary Google APIs for devices with max API Level 20>
+    * Example Call:		<ttsUnder20("Hello World!")>
     *
     */
 
@@ -104,11 +104,11 @@ public class MainActivity extends AppCompatActivity {
 
     /*
     *
-    * Function Name: 	<Function Name>
-    * Input: 		<Inputs (or Parameters) list with description if any>
-    * Output: 		<Return value with description if any>
-    * Logic: 		<Description of the function performed and the logic used in the function>
-    * Example Call:		<Example of how to call this function>
+    * Function Name: 	<ttsUnder21>
+    * Input: 		<String text(Text to be spoken)>
+    * Output: 		<void>
+    * Logic: 		<Function calls the necessary Google APIs for devices with min API Level 21>
+    * Example Call:		<ttsUnder21("Hello World!")>
     *
     */
 
@@ -122,11 +122,11 @@ public class MainActivity extends AppCompatActivity {
 
        /*
         *
-        * Function Name: 	<Function Name>
-        * Input: 		<Inputs (or Parameters) list with description if any>
-        * Output: 		<Return value with description if any>
-        * Logic: 		<Description of the function performed and the logic used in the function>
-        * Example Call:		<Example of how to call this function>
+        * Function Name: 	<onReceive>
+        * Input: 		<Overridden function>
+        * Output: 		<void>
+        * Logic: 		<Receives Broadcast messages with specific title>
+        * Example Call:		<Called automatically by OS>
         *
         */
 
@@ -140,6 +140,16 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    /*
+        *
+        * Function Name: 	<onReceive>
+        * Input: 		<Overridden function>
+        * Output: 		<void>
+        * Logic: 		<Receives Broadcast messages with specific title>
+        * Example Call:		<Called automatically by OS>
+        *
+        */
+
     private void speakStatement(String text){
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             ttsGreater21(text);
@@ -147,6 +157,16 @@ public class MainActivity extends AppCompatActivity {
             ttsUnder20(text);
         }
     }
+
+    /*
+        *
+        * Function Name: 	<initFCM>
+        * Input: 		<void>
+        * Output: 		<void>
+        * Logic: 		<Checks if FCM token present, if not, then calls necessary functions>
+        * Example Call:		<initFCM()>
+        *
+        */
 
     private void initFCM() {
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
@@ -166,6 +186,16 @@ public class MainActivity extends AppCompatActivity {
             Log.e("TOKEN", sp.getString("token", ""));
         }
     }
+
+    /*
+        *
+        * Function Name: 	<sendFCM>
+        * Input: 		<String token(Firebase token)>
+        * Output: 		<void>
+        * Logic: 		<Sends Firebase token to remote server using Volley>
+        * Example Call:		<sendFCM("MyFirebaseTokenisNULL")>
+        *
+        */
 
     private void sendFCM(final String token){
         StringRequest stringRequest = new StringRequest(Request.Method.POST, BASE_URL_DEFAULT + "saveToken.php",

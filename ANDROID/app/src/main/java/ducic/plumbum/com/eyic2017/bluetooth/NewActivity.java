@@ -67,11 +67,11 @@ public class NewActivity extends Activity {
 
     /*
     *
-    * Function Name: 	<Function Name>
-    * Input: 		<Inputs (or Parameters) list with description if any>
-    * Output: 		<Return value with description if any>
-    * Logic: 		<Description of the function performed and the logic used in the function>
-    * Example Call:		<Example of how to call this function>
+    * Function Name: 	<onCreate>
+    * Input: 		<Bundle savedInstanceState(For saving and retrieving data)>
+    * Output: 		<void>
+    * Logic: 		<Equivalent to 'main' function in JAVA>
+    * Example Call:		<Called automatically by OS>
     *
     */
 
@@ -146,17 +146,17 @@ public class NewActivity extends Activity {
 
     /*
     *
-    * Function Name: 	<Function Name>
-    * Input: 		<Inputs (or Parameters) list with description if any>
-    * Output: 		<Return value with description if any>
-    * Logic: 		<Description of the function performed and the logic used in the function>
-    * Example Call:		<Example of how to call this function>
+    * Function Name: 	<createBluetoothSocket>
+    * Input: 		<BluetoothDevice device(connected bluetooth device)>
+    * Output: 		<BluetoothSocket(returns socket to the connected device)>
+    * Logic: 		<returns socket to the connected device>
+    * Example Call:		<createBluetoothSocket(new BluetoothDevice)>
     *
     */
 
     private BluetoothSocket createBluetoothSocket(BluetoothDevice device) throws IOException {
         try {
-            final Method m = device.getClass().getMethod("createInsecureRfcommSocketToServiceRecord", new Class[] { UUID.class });
+            final Method m = device.getClass().getMethod("createInsecureRfcommSocketToServiceRecord", UUID.class);
             return (BluetoothSocket) m.invoke(device, MY_UUID);
         } catch (Exception e) {
             Log.e(TAG, "Could not create Insecure RFComm Connection",e);
@@ -166,11 +166,11 @@ public class NewActivity extends Activity {
 
     /*
     *
-    * Function Name: 	<Function Name>
-    * Input: 		<Inputs (or Parameters) list with description if any>
-    * Output: 		<Return value with description if any>
-    * Logic: 		<Description of the function performed and the logic used in the function>
-    * Example Call:		<Example of how to call this function>
+    * Function Name: 	<onOptionsItemSelected>
+    * Input: 		<Overridden function>
+    * Output: 		<Overridden function>
+    * Logic: 		<Overridden function>
+    * Example Call:		<System makes automatic calls>
     *
     */
 
@@ -220,11 +220,11 @@ public class NewActivity extends Activity {
 
     /*
     *
-    * Function Name: 	<Function Name>
-    * Input: 		<Inputs (or Parameters) list with description if any>
-    * Output: 		<Return value with description if any>
-    * Logic: 		<Description of the function performed and the logic used in the function>
-    * Example Call:		<Example of how to call this function>
+    * Function Name: 	<onOptionsItemSelected>
+    * Input: 		<Overridden function>
+    * Output: 		<Overridden function>
+    * Logic: 		<Overridden function>
+    * Example Call:		<System makes automatic calls>
     *
     */
 
@@ -351,11 +351,11 @@ public class NewActivity extends Activity {
 
     /*
     *
-    * Function Name: 	<Function Name>
-    * Input: 		<Inputs (or Parameters) list with description if any>
-    * Output: 		<Return value with description if any>
-    * Logic: 		<Description of the function performed and the logic used in the function>
-    * Example Call:		<Example of how to call this function>
+    * Function Name: 	<ttsUnder20>
+    * Input: 		<String text(Text to be spoken)>
+    * Output: 		<void>
+    * Logic: 		<Function calls the necessary Google APIs for devices with max API Level 20>
+    * Example Call:		<ttsUnder20("Hello World!")>
     *
     */
 
@@ -368,11 +368,11 @@ public class NewActivity extends Activity {
 
     /*
     *
-    * Function Name: 	<Function Name>
-    * Input: 		<Inputs (or Parameters) list with description if any>
-    * Output: 		<Return value with description if any>
-    * Logic: 		<Description of the function performed and the logic used in the function>
-    * Example Call:		<Example of how to call this function>
+    * Function Name: 	<ttsUnder21>
+    * Input: 		<String text(Text to be spoken)>
+    * Output: 		<void>
+    * Logic: 		<Function calls the necessary Google APIs for devices with min API Level 21>
+    * Example Call:		<ttsUnder21("Hello World!")>
     *
     */
 

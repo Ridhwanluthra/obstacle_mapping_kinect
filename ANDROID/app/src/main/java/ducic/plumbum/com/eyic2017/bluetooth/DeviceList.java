@@ -61,11 +61,11 @@ public class DeviceList extends AppCompatActivity {
 
     /*
     *
-    * Function Name: 	<Function Name>
-    * Input: 		<Inputs (or Parameters) list with description if any>
-    * Output: 		<Return value with description if any>
-    * Logic: 		<Description of the function performed and the logic used in the function>
-    * Example Call:		<Example of how to call this function>
+    * Function Name: 	<onCreate>
+    * Input: 		<Bundle savedInstanceState(For saving and retrieving data)>
+    * Output: 		<void>
+    * Logic: 		<Equivalent to 'main' function in JAVA>
+    * Example Call:		<Called automatically by OS>
     *
     */
 
@@ -105,11 +105,11 @@ public class DeviceList extends AppCompatActivity {
 
     /*
     *
-    * Function Name: 	<Function Name>
-    * Input: 		<Inputs (or Parameters) list with description if any>
-    * Output: 		<Return value with description if any>
-    * Logic: 		<Description of the function performed and the logic used in the function>
-    * Example Call:		<Example of how to call this function>
+    * Function Name: 	<pairedDevicesList>
+    * Input: 		<void>
+    * Output: 		<void>
+    * Logic: 		<Shows list of paired Bluetooth devices>
+    * Example Call:		<pairedDevicesList()>
     *
     */
 
@@ -137,11 +137,11 @@ public class DeviceList extends AppCompatActivity {
 
     /*
     *
-    * Function Name: 	<Function Name>
-    * Input: 		<Inputs (or Parameters) list with description if any>
-    * Output: 		<Return value with description if any>
-    * Logic: 		<Description of the function performed and the logic used in the function>
-    * Example Call:		<Example of how to call this function>
+    * Function Name: 	<onCreateOptionsMenu>
+    * Input: 		<Overridden function>
+    * Output: 		<Overridden function>
+    * Logic: 		<Overridden function>
+    * Example Call:		<System makes automatic calls>
     *
     */
 
@@ -154,11 +154,11 @@ public class DeviceList extends AppCompatActivity {
 
     /*
     *
-    * Function Name: 	<Function Name>
-    * Input: 		<Inputs (or Parameters) list with description if any>
-    * Output: 		<Return value with description if any>
-    * Logic: 		<Description of the function performed and the logic used in the function>
-    * Example Call:		<Example of how to call this function>
+    * Function Name: 	<onOptionsItemSelected>
+    * Input: 		<Overridden function>
+    * Output: 		<Overridden function>
+    * Logic: 		<Overridden function>
+    * Example Call:		<System makes automatic calls>
     *
     */
 

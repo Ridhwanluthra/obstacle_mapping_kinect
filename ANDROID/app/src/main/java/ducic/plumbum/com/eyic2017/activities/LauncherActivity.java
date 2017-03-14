@@ -24,11 +24,11 @@ public class LauncherActivity extends AppCompatActivity {
 
     /*
     *
-    * Function Name: 	<Function Name>
-    * Input: 		<Inputs (or Parameters) list with description if any>
-    * Output: 		<Return value with description if any>
-    * Logic: 		<Description of the function performed and the logic used in the function>
-    * Example Call:		<Example of how to call this function>
+    * Function Name: 	<onCreate>
+    * Input: 		<Bundle savedInstanceState(For saving and retrieving data)>
+    * Output: 		<void>
+    * Logic: 		<Equivalent to 'main' function in JAVA>
+    * Example Call:		<Called automatically by OS>
     *
     */
 
