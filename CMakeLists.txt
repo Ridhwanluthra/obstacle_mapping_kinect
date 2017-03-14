@@ -205,11 +205,11 @@ include_directories(
 add_executable(cluster_distances src/cluster_distances.cpp)
 target_link_libraries(cluster_distances ${catkin_LIBRARIES})
 
-#add_executable(cluster_extraction src/cluster_extraction.cpp)
-#target_link_libraries(cluster_extraction ${catkin_LIBRARIES})
+add_executable(cluster_extraction src/cluster_extraction.cpp)
+target_link_libraries(cluster_extraction ${catkin_LIBRARIES})
 
-#add_executable(find_min_distance src/find_min_distance.cpp)
-#target_link_libraries(find_min_distance ${catkin_LIBRARIES})
+add_executable(find_min_distance src/find_min_distance.cpp)
+target_link_libraries(find_min_distance ${catkin_LIBRARIES})
 
-#add_executable(remove_floor src/remove_floor.cpp)
-#target_link_libraries(remove_floor ${catkin_LIBRARIES})
+add_executable(remove_floor src/remove_floor.cpp)
+target_link_libraries(remove_floor ${catkin_LIBRARIES})
