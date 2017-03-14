@@ -24,11 +24,11 @@ public class Singleton extends MultiDexApplication {
 
     /*
     *
-    * Function Name: 	<Function Name>
-    * Input: 		<Inputs (or Parameters) list with description if any>
-    * Output: 		<Return value with description if any>
-    * Logic: 		<Description of the function performed and the logic used in the function>
-    * Example Call:		<Example of how to call this function>
+    * Function Name: 	<onCreate>
+    * Input: 		<Bundle savedInstanceState(For saving and retrieving data)>
+    * Output: 		<void>
+    * Logic: 		<Equivalent to 'main' function in JAVA>
+    * Example Call:		<Called automatically by OS>
     *
     */
 
@@ -41,11 +41,11 @@ public class Singleton extends MultiDexApplication {
 
     /*
     *
-    * Function Name: 	<Function Name>
-    * Input: 		<Inputs (or Parameters) list with description if any>
-    * Output: 		<Return value with description if any>
-    * Logic: 		<Description of the function performed and the logic used in the function>
-    * Example Call:		<Example of how to call this function>
+    * Function Name: 	<getInstance>
+    * Input: 		<void>
+    * Output: 		<Singleton (Returns instance of this class)>
+    * Logic: 		<Returns instance of this class. Since it is synchronized, only once instance at a time>
+    * Example Call:		<getInstance()>
     *
     */
 
@@ -55,11 +55,11 @@ public class Singleton extends MultiDexApplication {
 
     /*
     *
-    * Function Name: 	<Function Name>
-    * Input: 		<Inputs (or Parameters) list with description if any>
-    * Output: 		<Return value with description if any>
-    * Logic: 		<Description of the function performed and the logic used in the function>
-    * Example Call:		<Example of how to call this function>
+    * Function Name: 	<getRequestQueue>
+    * Input: 		<void>
+    * Output: 		<RequestQueue(Volley request queue is returned)>
+    * Logic: 		<If a queue does not exist, a new queue is sent, else the existing queue is returned>
+    * Example Call:		<getRequestQueue()>
     *
     */
 
@@ -72,11 +72,11 @@ public class Singleton extends MultiDexApplication {
 
     /*
     *
-    * Function Name: 	<Function Name>
-    * Input: 		<Inputs (or Parameters) list with description if any>
-    * Output: 		<Return value with description if any>
-    * Logic: 		<Description of the function performed and the logic used in the function>
-    * Example Call:		<Example of how to call this function>
+    * Function Name: 	<addToRequestQueue>
+    * Input: 		<Request<T> req(The POST, GET, PUT, DELETE request to be sent)>
+    * Output: 		<void>
+    * Logic: 		<a new request is added to the exisitng queue>
+    * Example Call:		<addToRequestQueue(new Request())>
     *
     */
 

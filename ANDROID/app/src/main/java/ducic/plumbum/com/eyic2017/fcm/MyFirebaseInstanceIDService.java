@@ -18,10 +18,10 @@ public class MyFirebaseInstanceIDService extends FirebaseInstanceIdService {
 
     /*
     *
-    * Function Name: 	<onOptionsItemSelected>
+    * Function Name: 	<onTokenRefresh>
     * Input: 		<Overridden function>
     * Output: 		<Overridden function>
-    * Logic: 		<Overridden function>
+    * Logic: 		<Call made to this function when Firebase Cloud Messaging token is refreshed>
     * Example Call:		<System makes automatic calls>
     *
     */

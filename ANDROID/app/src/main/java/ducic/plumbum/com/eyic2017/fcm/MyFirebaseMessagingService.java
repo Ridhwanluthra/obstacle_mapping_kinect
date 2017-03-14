@@ -32,10 +32,10 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
 
     /*
     *
-    * Function Name: 	<onOptionsItemSelected>
+    * Function Name: 	<onMessageReceived>
     * Input: 		<Overridden function>
     * Output: 		<Overridden function>
-    * Logic: 		<Overridden function>
+    * Logic: 		<When a new message notification is received, this function gets called>
     * Example Call:		<System makes automatic calls>
     *
     */
@@ -59,11 +59,11 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
 
     /*
     *
-    * Function Name: 	<Function Name>
-    * Input: 		<Inputs (or Parameters) list with description if any>
-    * Output: 		<Return value with description if any>
-    * Logic: 		<Description of the function performed and the logic used in the function>
-    * Example Call:		<Example of how to call this function>
+    * Function Name: 	<sendNotification>
+    * Input: 		<Map<String, String> messageBody(A combination of key-value pair is sent)>
+    * Output: 		<void>
+    * Logic: 		<Call required class for handling the notification>
+    * Example Call:		<sendNotification(new Map<String, String>())>
     *
     */
 

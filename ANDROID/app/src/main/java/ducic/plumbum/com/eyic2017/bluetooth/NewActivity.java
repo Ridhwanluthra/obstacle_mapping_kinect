@@ -243,11 +243,11 @@ public class NewActivity extends Activity {
 
     /*
     *
-    * Function Name: 	<Function Name>
-    * Input: 		<Inputs (or Parameters) list with description if any>
-    * Output: 		<Return value with description if any>
-    * Logic: 		<Description of the function performed and the logic used in the function>
-    * Example Call:		<Example of how to call this function>
+    * Function Name: 	<checkBTState>
+    * Input: 		<void>
+    * Output: 		<void>
+    * Logic: 		<Check for Bluetooth support and then check to make sure it is turned on>
+    * Example Call:		<checkBTState()>
     *
     */
 
@@ -269,11 +269,11 @@ public class NewActivity extends Activity {
 
     /*
     *
-    * Function Name: 	<Function Name>
-    * Input: 		<Inputs (or Parameters) list with description if any>
-    * Output: 		<Return value with description if any>
-    * Logic: 		<Description of the function performed and the logic used in the function>
-    * Example Call:		<Example of how to call this function>
+    * Function Name: 	<errorExit>
+    * Input: 		<String title(title of error), String message(Actual error message)>
+    * Output: 		<void>
+    * Logic: 		<Toast is generated on error occurance>
+    * Example Call:		<errorExit("Error Title", "Error Message")>
     *
     */
 
@@ -286,7 +286,7 @@ public class NewActivity extends Activity {
         private final InputStream mmInStream;
         private final OutputStream mmOutStream;
 
-        public ConnectedThread(BluetoothSocket socket) {
+        ConnectedThread(BluetoothSocket socket) {
             InputStream tmpIn = null;
             OutputStream tmpOut = null;
 
@@ -295,7 +295,7 @@ public class NewActivity extends Activity {
             try {
                 tmpIn = socket.getInputStream();
                 tmpOut = socket.getOutputStream();
-            } catch (IOException e) { }
+            } catch (IOException ignored) { }
 
             mmInStream = tmpIn;
             mmOutStream = tmpOut;
@@ -303,11 +303,11 @@ public class NewActivity extends Activity {
 
         /*
         *
-        * Function Name: 	<Function Name>
-        * Input: 		<Inputs (or Parameters) list with description if any>
-        * Output: 		<Return value with description if any>
-        * Logic: 		<Description of the function performed and the logic used in the function>
-        * Example Call:		<Example of how to call this function>
+        * Function Name: 	<run>
+        * Input: 		<void>
+        * Output: 		<void>
+        * Logic: 		<Automatically called>
+        * Example Call:		<It is a thread. call Thread.execute()>
         *
         */
 
@@ -329,7 +329,7 @@ public class NewActivity extends Activity {
 
         /*
         *
-        * Function Name: 	<Function Name>
+        * Function Name: 	<write>
         * Input: 		<Inputs (or Parameters) list with description if any>
         * Output: 		<Return value with description if any>
         * Logic: 		<Description of the function performed and the logic used in the function>

@@ -4,9 +4,9 @@ package ducic.plumbum.com.eyic2017.utils;
  *
  * Project Name: 	<Visual Perception For The Visually Impaired>
  * Author List: 		Pankaj Baranwal
- * Filename: 		<>
- * Functions: 		<>
- * Global Variables:	<>
+ * Filename: 		<Constants.java>
+ * Functions: 		<->
+ * Global Variables:	<String BASE_URL_DEFAULT>
  *
  */
 

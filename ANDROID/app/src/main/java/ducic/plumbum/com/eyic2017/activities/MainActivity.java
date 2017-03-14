@@ -142,11 +142,11 @@ public class MainActivity extends AppCompatActivity {
 
     /*
         *
-        * Function Name: 	<onReceive>
-        * Input: 		<Overridden function>
+        * Function Name: 	<speakStatement>
+        * Input: 		<String text(Text to be spoken)>
         * Output: 		<void>
-        * Logic: 		<Receives Broadcast messages with specific title>
-        * Example Call:		<Called automatically by OS>
+        * Logic: 		<Checks which API phone is running on, and calls the req function>
+        * Example Call:		<speakStatement("Hello World!")>
         *
         */
 
