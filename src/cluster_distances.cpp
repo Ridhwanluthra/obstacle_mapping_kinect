@@ -255,8 +255,9 @@ cloud_cb (const sensor_msgs::PointCloud2ConstPtr& input)
     ext.setNegative (false);
     ext.filter (*cloud_f);
     range = get_distance(cloud_f, j);
-    std::cout<<range<<endl;
-    if (range >= 2){
+    std::cout<<range<<std::endl;
+	ROS_INFO_STREAM(range);
+    if (range >= 3.5){
       continue;
     }
     cloud_xyzrgb = *cloud_f;
