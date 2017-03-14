@@ -1,3 +1,12 @@
+/*
+*
+* Project Name:   Visual perception for the visually impaired
+* Author List:    
+* Filename:     cluster_extraction.cpp
+* Functions:    cloud_cb, main 
+* Global Variables: pub -> Ros publisher
+*
+*/
 #include <ros/ros.h>
 #include <sensor_msgs/PointCloud2.h>
 
@@ -22,7 +31,15 @@
 using namespace::std;
 
 ros::Publisher pub;
-
+/*
+*
+* Function Name: cloud_cb
+* Input: input -> A ros message service that provides point cloud data from kinect
+* Output:  Publishes extracted cluster. 
+* Logic:   
+* Example Call: Callback function. Manual calling not required. 
+*
+*/
 void 
 cloud_cb (const sensor_msgs::PointCloud2ConstPtr& input)
 {
