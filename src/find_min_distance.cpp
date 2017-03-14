@@ -37,7 +37,15 @@
 * angle the point made Verticlly    min_angle_rady=atan2(pt.z, pt.y);
 */
 
-
+/*
+*
+* Project Name:   Visual perception for the visually impaired
+* Author List:     
+* Filename:     find_min_distance.cpp
+* Functions:    callback, main 
+* Global Variables: N.A.
+*
+*/
 
 #include <ros/ros.h>
 #include <pcl_ros/point_cloud.h>
@@ -49,6 +57,16 @@
 
 using namespace::std;
 
+
+/*
+*
+* function name: callback
+* input:  msg -> a point cloud data to be worked on 
+* output: finds the minimum distance in the point cloud  
+* logic:   
+* example call: callback function. manual calling not required.
+*
+*/
 void callback(const pcl::PointCloud<pcl::PointXYZ>::ConstPtr& msg){
   double minDistance = std::numeric_limits<double>::infinity();;
   double min_angle_radx=0.0;

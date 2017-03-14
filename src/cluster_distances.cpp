@@ -1,3 +1,12 @@
+/*
+*
+* Project Name:   Visual perception for the visually impaired
+* Author List:    
+* Filename:     cluster_distances.cpp
+* Functions:    get_distance, cloud_cb, main
+* Global Variables: pub, dist_pub, minx_pub, maxx_pub, minu_pub, z_pub, y_pub, x_pub, arr_pub, j
+*
+*/
 #include <ros/ros.h>
 #include <sensor_msgs/PointCloud2.h>
 
@@ -88,8 +97,17 @@ int j = 0;
 //  // sleep(3); //use sleep if you want to delay loop.
 // }
 
-
 double get_distance(const pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr& msg, int counter){
+/*
+*
+* Function Name:  get_distance
+* Input:    msg -> stores point cloud information to be processed
+            counter -> [NOT_SURE] 
+* Output:    Publishes the minimum distance to ROS publisher
+* Logic:    Iterates through all points in the filtered point cloud and publishes the point that is the closest.
+* Example Call:  get_distance (cloud, j)
+*
+*/
   double minDistance[4] = {std::numeric_limits<double>::infinity(), std::numeric_limits<double>::infinity(), std::numeric_limits<double>::infinity()};
   double min_angle_radx[4] = {std::numeric_limits<double>::infinity(), std::numeric_limits<double>::infinity(), std::numeric_limits<double>::infinity()};
   double max_angle_radx[4] = {0.0, 0.0, 0.0};
@@ -139,6 +157,15 @@ double get_distance(const pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr& msg, int 
 
 
 
+/*
+*
+* Function Name:  cloud_cb
+* Input:    input -> A point cloud to work on 
+* Output:   Publishes the segmented point cloud 
+* Logic:    Filters the point cloud and segments it 
+* Example Call: Callback function. Manual calling not required 
+*
+*/
 void 
 cloud_cb (const sensor_msgs::PointCloud2ConstPtr& input)
 {
