@@ -5,7 +5,7 @@ import requests
 import math
 
 def callback(data):
-	rospy.loginfo(len(data.data))
+	rospy.loginfo(data.data[0])
 	min_dist = data.data[1:4]
 	angle_right = data.data[4:7]
 	angle_left = data.data[7:10]

@@ -1,3 +1,12 @@
+/*
+*
+* Project Name:   Visual perception for the visually impaired
+* Author List:    
+* Filename:     remove_floor.cpp
+* Functions:    callback, main 
+* Global Variables: pub -> Ros publisher
+*
+*/
 #include <ros/ros.h>
 // PCL specific includes voxel
 #include <sensor_msgs/PointCloud2.h>
@@ -24,8 +33,15 @@
 #include <pcl/filters/extract_indices.h>
 
 ros::Publisher pub;
-
-// This function is a callback for incoming pointcloud data
+/*
+*
+* Function Name: callback
+* Input: input -> A ros message service that provides point cloud data from kinect
+* Output:  Publishes the point cloud after removing floor.
+* Logic:   
+* Example Call: Callback function. Manual calling not required. 
+*
+*/
 void callback (const sensor_msgs::PointCloud2ConstPtr& input) {
 
   pcl::PCLPointCloud2* cloud_blob = new pcl::PCLPointCloud2; 

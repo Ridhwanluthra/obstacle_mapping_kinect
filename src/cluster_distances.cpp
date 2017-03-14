@@ -1,3 +1,12 @@
+/*
+*
+* Project Name:   Visual perception for the visually impaired
+* Author List:    
+* Filename:     cluster_distances.cpp
+* Functions:    get_distance, cloud_cb, main
+* Global Variables: pub, dist_pub, minx_pub, maxx_pub, minu_pub, z_pub, y_pub, x_pub, arr_pub, j
+*
+*/
 #include <ros/ros.h>
 #include <sensor_msgs/PointCloud2.h>
 
@@ -88,8 +97,17 @@ int j = 0;
 //  // sleep(3); //use sleep if you want to delay loop.
 // }
 
-
-void get_distance(const pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr& msg, int counter){
+double get_distance(const pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr& msg, int counter){
+/*
+*
+* Function Name:  get_distance
+* Input:    msg -> stores point cloud information to be processed
+            counter -> [NOT_SURE] 
+* Output:    Publishes the minimum distance to ROS publisher
+* Logic:    Iterates through all points in the filtered point cloud and publishes the point that is the closest.
+* Example Call:  get_distance (cloud, j)
+*
+*/
   double minDistance[4] = {std::numeric_limits<double>::infinity(), std::numeric_limits<double>::infinity(), std::numeric_limits<double>::infinity()};
   double min_angle_radx[4] = {std::numeric_limits<double>::infinity(), std::numeric_limits<double>::infinity(), std::numeric_limits<double>::infinity()};
   double max_angle_radx[4] = {0.0, 0.0, 0.0};
@@ -129,6 +147,7 @@ void get_distance(const pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr& msg, int co
     arr.data.push_back(max_angle_radx[i]);
   
   arr_pub.publish(arr);
+  return minDistance[0];
   // pub.publish(minDistance);
   // cout<<"Distance="<<minDistance[0]<<minDistance[1]<<minDistance[2]<<"\n";
   // cout<<"Angle in Degree X axis="<<min_angle_radx[0]*(180/3.14159265358979323846)<<min_angle_radx[1]*(180/3.14159265358979323846)<<min_angle_radx[2]*(180/3.14159265358979323846)<<"\n";
@@ -138,6 +157,15 @@ void get_distance(const pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr& msg, int co
 
 
 
+/*
+*
+* Function Name:  cloud_cb
+* Input:    input -> A point cloud to work on 
+* Output:   Publishes the segmented point cloud 
+* Logic:    Filters the point cloud and segments it 
+* Example Call: Callback function. Manual calling not required 
+*
+*/
 void 
 cloud_cb (const sensor_msgs::PointCloud2ConstPtr& input)
 {
@@ -216,6 +244,7 @@ cloud_cb (const sensor_msgs::PointCloud2ConstPtr& input)
   pcl::PCLPointCloud2 temp;
   *cloud_clust_remove = *cloud_filtered;
   pcl::PointCloud<pcl::PointXYZRGB> cloud_xyzrgb;
+  double range;
   for (int it = 0; it < cluster_indices.size(); ++it)
   {
 
@@ -225,7 +254,11 @@ cloud_cb (const sensor_msgs::PointCloud2ConstPtr& input)
     ext.setIndices(boost::shared_ptr<pcl::PointIndices> (new pcl::PointIndices(cluster_indices[it])));
     ext.setNegative (false);
     ext.filter (*cloud_f);
-    get_distance(cloud_f, j++);
+    range = get_distance(cloud_f, j);
+    std::cout<<range<<endl;
+    if (range >= 2){
+      continue;
+    }
     cloud_xyzrgb = *cloud_f;
 
     for (size_t i = 0; i < cloud_xyzrgb.points.size(); i++) {
@@ -243,6 +276,7 @@ cloud_cb (const sensor_msgs::PointCloud2ConstPtr& input)
     pcl::toPCLPointCloud2 (cloud_xyzrgb, temp);
     pcl::concatenatePointCloud(cloud_final, temp, cloud_final);
   }
+  j++;
   pub.publish (cloud_final);
 }
 
