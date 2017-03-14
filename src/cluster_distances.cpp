@@ -89,7 +89,7 @@ int j = 0;
 // }
 
 
-void get_distance(const pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr& msg, int counter){
+double get_distance(const pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr& msg, int counter){
   double minDistance[4] = {std::numeric_limits<double>::infinity(), std::numeric_limits<double>::infinity(), std::numeric_limits<double>::infinity()};
   double min_angle_radx[4] = {std::numeric_limits<double>::infinity(), std::numeric_limits<double>::infinity(), std::numeric_limits<double>::infinity()};
   double max_angle_radx[4] = {0.0, 0.0, 0.0};
@@ -129,6 +129,7 @@ void get_distance(const pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr& msg, int co
     arr.data.push_back(max_angle_radx[i]);
   
   arr_pub.publish(arr);
+  return minDistance[0];
   // pub.publish(minDistance);
   // cout<<"Distance="<<minDistance[0]<<minDistance[1]<<minDistance[2]<<"\n";
   // cout<<"Angle in Degree X axis="<<min_angle_radx[0]*(180/3.14159265358979323846)<<min_angle_radx[1]*(180/3.14159265358979323846)<<min_angle_radx[2]*(180/3.14159265358979323846)<<"\n";
@@ -216,6 +217,7 @@ cloud_cb (const sensor_msgs::PointCloud2ConstPtr& input)
   pcl::PCLPointCloud2 temp;
   *cloud_clust_remove = *cloud_filtered;
   pcl::PointCloud<pcl::PointXYZRGB> cloud_xyzrgb;
+  double range;
   for (int it = 0; it < cluster_indices.size(); ++it)
   {
 
@@ -225,7 +227,11 @@ cloud_cb (const sensor_msgs::PointCloud2ConstPtr& input)
     ext.setIndices(boost::shared_ptr<pcl::PointIndices> (new pcl::PointIndices(cluster_indices[it])));
     ext.setNegative (false);
     ext.filter (*cloud_f);
-    get_distance(cloud_f, j++);
+    range = get_distance(cloud_f, j);
+    std::cout<<range<<endl;
+    if (range >= 2){
+      continue;
+    }
     cloud_xyzrgb = *cloud_f;
 
     for (size_t i = 0; i < cloud_xyzrgb.points.size(); i++) {
@@ -243,6 +249,7 @@ cloud_cb (const sensor_msgs::PointCloud2ConstPtr& input)
     pcl::toPCLPointCloud2 (cloud_xyzrgb, temp);
     pcl::concatenatePointCloud(cloud_final, temp, cloud_final);
   }
+  j++;
   pub.publish (cloud_final);
 }
 
