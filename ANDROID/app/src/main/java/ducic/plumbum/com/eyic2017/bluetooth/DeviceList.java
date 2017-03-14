@@ -20,6 +20,19 @@ import java.util.Set;
 
 import ducic.plumbum.com.eyic2017.R;
 
+/**
+ *
+ * Project Name: 	<Visual Perception For The Visually Impaired>
+ * Author List: 		Pankaj Baranwal
+ * Filename: 		<DeviceList.java>
+ * Functions: 		<onCreate, pairedDevicesList, onCreateOptionsMenu,
+ *                  onOptionsItemSelected>
+ * Global Variables:	<public static String EXTRA_ADDRESS, Button btnPaired,
+ *                      ListView devicelist, BluetoothAdapter myBluetooth,
+ *                      Set<BluetoothDevice> pairedDevices,
+ *                      AdapterView.OnItemClickListener myListClickListener>
+ *
+ */
 
 public class DeviceList extends AppCompatActivity {
     public static String EXTRA_ADDRESS = "device_address";
@@ -45,6 +58,16 @@ public class DeviceList extends AppCompatActivity {
             startActivity(i);
         }
     };
+
+    /*
+    *
+    * Function Name: 	<Function Name>
+    * Input: 		<Inputs (or Parameters) list with description if any>
+    * Output: 		<Return value with description if any>
+    * Logic: 		<Description of the function performed and the logic used in the function>
+    * Example Call:		<Example of how to call this function>
+    *
+    */
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -80,6 +103,16 @@ public class DeviceList extends AppCompatActivity {
 
     }
 
+    /*
+    *
+    * Function Name: 	<Function Name>
+    * Input: 		<Inputs (or Parameters) list with description if any>
+    * Output: 		<Return value with description if any>
+    * Logic: 		<Description of the function performed and the logic used in the function>
+    * Example Call:		<Example of how to call this function>
+    *
+    */
+
     private void pairedDevicesList() {
         pairedDevices = myBluetooth.getBondedDevices();
         ArrayList<String> list = new ArrayList<String>();
@@ -102,12 +135,32 @@ public class DeviceList extends AppCompatActivity {
 
     }
 
+    /*
+    *
+    * Function Name: 	<Function Name>
+    * Input: 		<Inputs (or Parameters) list with description if any>
+    * Output: 		<Return value with description if any>
+    * Logic: 		<Description of the function performed and the logic used in the function>
+    * Example Call:		<Example of how to call this function>
+    *
+    */
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_device_list, menu);
         return true;
     }
+
+    /*
+    *
+    * Function Name: 	<Function Name>
+    * Input: 		<Inputs (or Parameters) list with description if any>
+    * Output: 		<Return value with description if any>
+    * Logic: 		<Description of the function performed and the logic used in the function>
+    * Example Call:		<Example of how to call this function>
+    *
+    */
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {

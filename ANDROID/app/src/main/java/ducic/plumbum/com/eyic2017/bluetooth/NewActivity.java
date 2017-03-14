@@ -28,7 +28,18 @@ import java.util.UUID;
 import ducic.plumbum.com.eyic2017.R;
 
 /**
- * Created by pankaj on 14/1/17.
+ *
+ * Project Name: 	<Visual Perception For The Visually Impaired>
+ * Author List: 		Pankaj Baranwal
+ * Filename: 		<NewActivity.java>
+ * Functions: 		<onCreate, createBluetoothSocket, onResume, onPause,
+ *                  checkBTState, errorExit, run, write, ttsUnder20, ttsUnder21>
+ * Global Variables:	<String TAG, Button btnOn, btnOff, TextView txtArduino,
+ *                      Handler h, int RECIEVE_MESSAGE, BluetoothAdapter btAdapter,
+ *                      BluetoothSocket btSocket, StringBuilder sb,
+ *                      ConnectedThread mConnectedThread, UUID MY_UUID,
+ *                      String address, TextToSpeech tts>
+ *
  */
 
 public class NewActivity extends Activity {
@@ -53,6 +64,16 @@ public class NewActivity extends Activity {
     private static String address = "00:15:FF:F2:19:5F";
 
     private TextToSpeech tts;
+
+    /*
+    *
+    * Function Name: 	<Function Name>
+    * Input: 		<Inputs (or Parameters) list with description if any>
+    * Output: 		<Return value with description if any>
+    * Logic: 		<Description of the function performed and the logic used in the function>
+    * Example Call:		<Example of how to call this function>
+    *
+    */
 
     /** Called when the activity is first created. */
     @Override
@@ -123,6 +144,16 @@ public class NewActivity extends Activity {
         });
     }
 
+    /*
+    *
+    * Function Name: 	<Function Name>
+    * Input: 		<Inputs (or Parameters) list with description if any>
+    * Output: 		<Return value with description if any>
+    * Logic: 		<Description of the function performed and the logic used in the function>
+    * Example Call:		<Example of how to call this function>
+    *
+    */
+
     private BluetoothSocket createBluetoothSocket(BluetoothDevice device) throws IOException {
         try {
             final Method m = device.getClass().getMethod("createInsecureRfcommSocketToServiceRecord", new Class[] { UUID.class });
@@ -132,6 +163,16 @@ public class NewActivity extends Activity {
         }
         return  device.createRfcommSocketToServiceRecord(MY_UUID);
     }
+
+    /*
+    *
+    * Function Name: 	<Function Name>
+    * Input: 		<Inputs (or Parameters) list with description if any>
+    * Output: 		<Return value with description if any>
+    * Logic: 		<Description of the function performed and the logic used in the function>
+    * Example Call:		<Example of how to call this function>
+    *
+    */
 
     @Override
     public void onResume() {
@@ -177,6 +218,16 @@ public class NewActivity extends Activity {
         mConnectedThread.start();
     }
 
+    /*
+    *
+    * Function Name: 	<Function Name>
+    * Input: 		<Inputs (or Parameters) list with description if any>
+    * Output: 		<Return value with description if any>
+    * Logic: 		<Description of the function performed and the logic used in the function>
+    * Example Call:		<Example of how to call this function>
+    *
+    */
+
     @Override
     public void onPause() {
         super.onPause();
@@ -189,6 +240,16 @@ public class NewActivity extends Activity {
             errorExit("Fatal Error", "In onPause() and failed to close socket." + e2.getMessage() + ".");
         }
     }
+
+    /*
+    *
+    * Function Name: 	<Function Name>
+    * Input: 		<Inputs (or Parameters) list with description if any>
+    * Output: 		<Return value with description if any>
+    * Logic: 		<Description of the function performed and the logic used in the function>
+    * Example Call:		<Example of how to call this function>
+    *
+    */
 
     private void checkBTState() {
         // Check for Bluetooth support and then check to make sure it is turned on
@@ -205,6 +266,16 @@ public class NewActivity extends Activity {
             }
         }
     }
+
+    /*
+    *
+    * Function Name: 	<Function Name>
+    * Input: 		<Inputs (or Parameters) list with description if any>
+    * Output: 		<Return value with description if any>
+    * Logic: 		<Description of the function performed and the logic used in the function>
+    * Example Call:		<Example of how to call this function>
+    *
+    */
 
     private void errorExit(String title, String message){
         Toast.makeText(getBaseContext(), title + " - " + message, Toast.LENGTH_LONG).show();
@@ -230,6 +301,16 @@ public class NewActivity extends Activity {
             mmOutStream = tmpOut;
         }
 
+        /*
+        *
+        * Function Name: 	<Function Name>
+        * Input: 		<Inputs (or Parameters) list with description if any>
+        * Output: 		<Return value with description if any>
+        * Logic: 		<Description of the function performed and the logic used in the function>
+        * Example Call:		<Example of how to call this function>
+        *
+        */
+
         public void run() {
             byte[] buffer = new byte[256];  // buffer store for the stream
             int bytes; // bytes returned from read()
@@ -246,6 +327,16 @@ public class NewActivity extends Activity {
             }
         }
 
+        /*
+        *
+        * Function Name: 	<Function Name>
+        * Input: 		<Inputs (or Parameters) list with description if any>
+        * Output: 		<Return value with description if any>
+        * Logic: 		<Description of the function performed and the logic used in the function>
+        * Example Call:		<Example of how to call this function>
+        *
+        */
+
         /* Call this from the main activity to send data to the remote device */
         public void write(String message) {
             Log.d(TAG, "...Data to send: " + message + "...");
@@ -258,12 +349,32 @@ public class NewActivity extends Activity {
         }
     }
 
+    /*
+    *
+    * Function Name: 	<Function Name>
+    * Input: 		<Inputs (or Parameters) list with description if any>
+    * Output: 		<Return value with description if any>
+    * Logic: 		<Description of the function performed and the logic used in the function>
+    * Example Call:		<Example of how to call this function>
+    *
+    */
+
     @SuppressWarnings("deprecation")
     private void ttsUnder20(String text) {
         HashMap<String, String> map = new HashMap<>();
         map.put(TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID, "MessageId");
         tts.speak(text, TextToSpeech.QUEUE_FLUSH, map);
     }
+
+    /*
+    *
+    * Function Name: 	<Function Name>
+    * Input: 		<Inputs (or Parameters) list with description if any>
+    * Output: 		<Return value with description if any>
+    * Logic: 		<Description of the function performed and the logic used in the function>
+    * Example Call:		<Example of how to call this function>
+    *
+    */
 
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     private void ttsGreater21(String text) {

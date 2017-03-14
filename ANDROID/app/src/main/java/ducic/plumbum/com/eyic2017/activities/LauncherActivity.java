@@ -11,10 +11,27 @@ import ducic.plumbum.com.eyic2017.R;
 import ducic.plumbum.com.eyic2017.bluetooth.DeviceList;
 
 /**
- * Created by pankaj on 14/3/17.
+ *
+ * Project Name: 	<Visual Perception For The Visually Impaired>
+ * Author List: 		Pankaj Baranwal
+ * Filename: 		<LauncherActivity.java>
+ * Functions: 		<onCreate>
+ * Global Variables:	<->
+ *
  */
 
 public class LauncherActivity extends AppCompatActivity {
+
+    /*
+    *
+    * Function Name: 	<Function Name>
+    * Input: 		<Inputs (or Parameters) list with description if any>
+    * Output: 		<Return value with description if any>
+    * Logic: 		<Description of the function performed and the logic used in the function>
+    * Example Call:		<Example of how to call this function>
+    *
+    */
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

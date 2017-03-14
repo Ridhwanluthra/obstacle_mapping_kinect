@@ -26,23 +26,39 @@ import com.android.volley.toolbox.StringRequest;
 import com.google.firebase.iid.FirebaseInstanceId;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
 import ducic.plumbum.com.eyic2017.R;
 import ducic.plumbum.com.eyic2017.Singleton;
-import ducic.plumbum.com.eyic2017.models.RosTopic;
 
 import static ducic.plumbum.com.eyic2017.utils.Constants.BASE_URL_DEFAULT;
+
+/**
+ *
+ * Project Name: 	<Visual Perception For The Visually Impaired>
+ * Author List: 		Pankaj Baranwal
+ * Filename: 		<MainActivity.java>
+ * Functions: 		<onCreate, ttsUnder20, ttsUnder21, onReceive, speakStatement, initFCM, sendFCM>
+ * Global Variables:	<Button convert, EditText text, private TextToSpeech tts, List<RosTopic> data, MainActivity.MyReceiver receiver>
+ *
+ */
 
 public class MainActivity extends AppCompatActivity {
     Button convert;
     EditText text;
     private TextToSpeech tts;
-    List<RosTopic> data;
     MainActivity.MyReceiver receiver;
 
+   /*
+    *
+    * Function Name: 	<Function Name>
+    * Input: 		<Inputs (or Parameters) list with description if any>
+    * Output: 		<Return value with description if any>
+    * Logic: 		<Description of the function performed and the logic used in the function>
+    * Example Call:		<Example of how to call this function>
+    *
+    */
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,12 +85,32 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    /*
+    *
+    * Function Name: 	<Function Name>
+    * Input: 		<Inputs (or Parameters) list with description if any>
+    * Output: 		<Return value with description if any>
+    * Logic: 		<Description of the function performed and the logic used in the function>
+    * Example Call:		<Example of how to call this function>
+    *
+    */
+
     @SuppressWarnings("deprecation")
     private void ttsUnder20(String text) {
         HashMap<String, String> map = new HashMap<>();
         map.put(TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID, "MessageId");
         tts.speak(text, TextToSpeech.QUEUE_FLUSH, map);
     }
+
+    /*
+    *
+    * Function Name: 	<Function Name>
+    * Input: 		<Inputs (or Parameters) list with description if any>
+    * Output: 		<Return value with description if any>
+    * Logic: 		<Description of the function performed and the logic used in the function>
+    * Example Call:		<Example of how to call this function>
+    *
+    */
 
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     private void ttsGreater21(String text) {
@@ -83,6 +119,16 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public class MyReceiver extends BroadcastReceiver {
+
+       /*
+        *
+        * Function Name: 	<Function Name>
+        * Input: 		<Inputs (or Parameters) list with description if any>
+        * Output: 		<Return value with description if any>
+        * Logic: 		<Description of the function performed and the logic used in the function>
+        * Example Call:		<Example of how to call this function>
+        *
+        */
 
         @Override
         public void onReceive(Context context, Intent intent) {

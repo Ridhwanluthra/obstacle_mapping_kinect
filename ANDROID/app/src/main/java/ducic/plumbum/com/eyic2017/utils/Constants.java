@@ -1,7 +1,13 @@
 package ducic.plumbum.com.eyic2017.utils;
 
 /**
- * Created by pankaj on 12/3/17.
+ *
+ * Project Name: 	<Visual Perception For The Visually Impaired>
+ * Author List: 		Pankaj Baranwal
+ * Filename: 		<>
+ * Functions: 		<>
+ * Global Variables:	<>
+ *
  */
 
 public class Constants {

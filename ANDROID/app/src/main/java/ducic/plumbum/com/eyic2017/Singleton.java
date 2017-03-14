@@ -1,15 +1,19 @@
 package ducic.plumbum.com.eyic2017;
 
 import android.support.multidex.MultiDexApplication;
-import android.text.TextUtils;
 
-import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.Volley;
 
 /**
- * Created by pankaj on 25/2/17.
+ *
+ * Project Name: 	<Visual Perception For The Visually Impaired>
+ * Author List: 		Pankaj Baranwal
+ * Filename: 		<Singleton.java>
+ * Functions: 		<onCreate, getInstance, getRequestQueue, addToRequestQueue>
+ * Global Variables:	<String TAG, Singleton mInstance, RequestQueue requestQueue>
+ *
  */
 
 public class Singleton extends MultiDexApplication {
@@ -18,6 +22,15 @@ public class Singleton extends MultiDexApplication {
     private static Singleton mInstance;
     private RequestQueue requestQueue;
 
+    /*
+    *
+    * Function Name: 	<Function Name>
+    * Input: 		<Inputs (or Parameters) list with description if any>
+    * Output: 		<Return value with description if any>
+    * Logic: 		<Description of the function performed and the logic used in the function>
+    * Example Call:		<Example of how to call this function>
+    *
+    */
 
     @Override
     public void onCreate() {
@@ -26,9 +39,29 @@ public class Singleton extends MultiDexApplication {
         requestQueue = getRequestQueue();
     }
 
+    /*
+    *
+    * Function Name: 	<Function Name>
+    * Input: 		<Inputs (or Parameters) list with description if any>
+    * Output: 		<Return value with description if any>
+    * Logic: 		<Description of the function performed and the logic used in the function>
+    * Example Call:		<Example of how to call this function>
+    *
+    */
+
     public static synchronized Singleton getInstance() {
         return mInstance;
     }
+
+    /*
+    *
+    * Function Name: 	<Function Name>
+    * Input: 		<Inputs (or Parameters) list with description if any>
+    * Output: 		<Return value with description if any>
+    * Logic: 		<Description of the function performed and the logic used in the function>
+    * Example Call:		<Example of how to call this function>
+    *
+    */
 
     public RequestQueue getRequestQueue() {
         if (requestQueue == null)
@@ -37,22 +70,18 @@ public class Singleton extends MultiDexApplication {
         return requestQueue;
     }
 
-    public <T>void addToRequestQueue(Request<T> req, String tag) {
-        req.setTag(TextUtils.isEmpty(tag) ? TAG : tag);
-        req.setRetryPolicy(new DefaultRetryPolicy(5000, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
-        getRequestQueue().add(req);
-    }
+    /*
+    *
+    * Function Name: 	<Function Name>
+    * Input: 		<Inputs (or Parameters) list with description if any>
+    * Output: 		<Return value with description if any>
+    * Logic: 		<Description of the function performed and the logic used in the function>
+    * Example Call:		<Example of how to call this function>
+    *
+    */
 
     public <T>void addToRequestQueue(Request<T> req) {
         req.setTag(TAG);
         getRequestQueue().add(req);
     }
-
-    public void cancelPendingRequests(Object tag) {
-        if (requestQueue != null) {
-            requestQueue.cancelAll(tag);
-        }
-    }
-
-
 }
