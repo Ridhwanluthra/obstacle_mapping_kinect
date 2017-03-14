@@ -55,8 +55,11 @@ double get_distance(const pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr& msg, int 
 * Example Call:  get_distance (cloud, j)
 *
 */
+
   double minDistance[4] = {std::numeric_limits<double>::infinity(), std::numeric_limits<double>::infinity(), std::numeric_limits<double>::infinity()};
+// angles of rightmost point in the cluster
   double min_angle_radx[4] = {std::numeric_limits<double>::infinity(), std::numeric_limits<double>::infinity(), std::numeric_limits<double>::infinity()};
+// angles of leftmost point in the cluster
   double max_angle_radx[4] = {0.0, 0.0, 0.0};
   int count=0;
   // int i = 0;
@@ -118,6 +121,8 @@ double get_distance(const pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr& msg, int 
 void 
 cloud_cb (const sensor_msgs::PointCloud2ConstPtr& input)
 {
+  int minClusterSize = 100, maxClusterSize = 25000, maxIterations;
+  double leaf_size = 0.1, distanceThreshold = 0.02, clusterTolerance = 0.05;
   
   pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud_f (new pcl::PointCloud<pcl::PointXYZRGB>);
   
@@ -136,7 +141,7 @@ cloud_cb (const sensor_msgs::PointCloud2ConstPtr& input)
   // Perform the actual filtering
   pcl::VoxelGrid<pcl::PCLPointCloud2> sor;
   sor.setInputCloud (cloudPtr);
-  sor.setLeafSize (0.05, 0.05, 0.05);
+  sor.setLeafSize (leaf_size, leaf_size, leaf_size);
   sor.filter (cloud_filtered_blob);
 
   pcl::fromPCLPointCloud2 (cloud_filtered_blob, *cloud_filtered);
@@ -150,8 +155,8 @@ cloud_cb (const sensor_msgs::PointCloud2ConstPtr& input)
   seg.setOptimizeCoefficients (true);
   seg.setModelType (pcl::SACMODEL_PLANE);
   seg.setMethodType (pcl::SAC_RANSAC);
-  seg.setMaxIterations (100);
-  seg.setDistanceThreshold (0.02);
+  seg.setMaxIterations (maxIterations);
+  seg.setDistanceThreshold (distanceThreshold);
 
   int i=0, nr_points = (int) cloud_filtered->points.size ();
   while (cloud_filtered->points.size () > 0.3 * nr_points)
@@ -181,9 +186,9 @@ cloud_cb (const sensor_msgs::PointCloud2ConstPtr& input)
 
   std::vector<pcl::PointIndices> cluster_indices;
   pcl::EuclideanClusterExtraction<pcl::PointXYZRGB> ec;
-  ec.setClusterTolerance (0.05);
-  ec.setMinClusterSize (100);
-  ec.setMaxClusterSize (25000);
+  ec.setClusterTolerance (clusterTolerance);
+  ec.setMinClusterSize (minClusterSize);
+  ec.setMaxClusterSize (maxClusterSize);
   ec.setSearchMethod (tree);
   ec.setInputCloud (cloud_filtered);
   ec.extract (cluster_indices);
@@ -207,7 +212,7 @@ cloud_cb (const sensor_msgs::PointCloud2ConstPtr& input)
     range = get_distance(cloud_f, j);
     std::cout<<range<<std::endl;
     // to ignore far away clusters for brevity.
-    if (range >= 3.5){
+    if (range >= 4){
       continue;
     }
     cloud_xyzrgb = *cloud_f;
