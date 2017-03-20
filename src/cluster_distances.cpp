@@ -121,8 +121,8 @@ double get_distance(const pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr& msg, int 
 void 
 cloud_cb (const sensor_msgs::PointCloud2ConstPtr& input)
 {
-  int minClusterSize = 100, maxClusterSize = 25000, maxIterations;
-  double leaf_size = 0.1, distanceThreshold = 0.02, clusterTolerance = 0.05;
+  int minClusterSize = 100, maxClusterSize = 25000, maxIterations=100;
+  double leaf_size = 0.05, distanceThreshold = 0.02, clusterTolerance = 0.05;
   
   pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud_f (new pcl::PointCloud<pcl::PointXYZRGB>);
   
