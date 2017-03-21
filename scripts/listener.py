@@ -60,8 +60,8 @@ def callback(data):
             direction.append("right" if angle[-1] < 0 else "left")
         sentence = ""
         for i in range(len(width)):
-            sentence += "there is a " + str(int(width[i])) + "meter wide object towards your " + direction[i] + "at an angle of " + str(abs(angle[i] * (180 / math.pi))) + "and"
-        sentence = sentence[:-4]
+            sentence += "there is a " + str(int(width[i])) + " meter wide object towards your " + direction[i] + " at an angle of " + str(abs(angle[i] * (180 / math.pi))) + " and "
+        sentence = sentence[:-6]
         r = requests.post("http://www.lithics.in/apis/eyic/firebase.php", data={'message':sentence})
         width = list()
         angle = list()
