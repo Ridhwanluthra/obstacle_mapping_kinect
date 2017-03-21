@@ -23,7 +23,8 @@ sentence = ""
 width = list()
 angle = list()
 direction = list()
-
+# send_data = bool()
+val = int()
 '''
 *
 * Function Name:    callback
@@ -34,13 +35,12 @@ direction = list()
 *
 '''
 def callback(data):
-    global curr_frame, data_per_frame, sentence, width, angle, direction
-    rospy.loginfo("Data.data")
-    rospy.loginfo(data.data)
+    global curr_frame, data_per_frame, sentence, width, angle, direction, val
+    # rospy.loginfo("Data.data")
+    # rospy.loginfo(data.data)
 
-    
-    rospy.loginfo("Data[0]")
-    rospy.loginfo(data.data[0])
+    # rospy.loginfo("Data[0]")
+    # rospy.loginfo(data.data[0])
 
     # unpacking the data
     min_dist = data.data[1:4]
@@ -62,12 +62,25 @@ def callback(data):
         for i in range(len(width)):
             sentence += "there is a " + str(int(width[i])) + " meter wide object towards your " + direction[i] + " at an angle of " + str(abs(angle[i] * (180 / math.pi))) + " and "
         sentence = sentence[:-6]
-        r = requests.post("http://www.lithics.in/apis/eyic/firebase.php", data={'message':sentence})
+        r = requests.get("http://www.lithics.in/apis/eyic/getStatus.php")
+
+        rospy.loginfo('r.content')
+        rospy.loginfo(r.content)
+        rospy.loginfo('val')
+        rospy.loginfo(val)
+        
+        if val != int(r.content):
+            print(sentence)
+            rp = requests.post("http://www.lithics.in/apis/eyic/firebase.php", data={'message':sentence})
+        
+        val = int(r.content)
+        
+        # sentence = ""
         width = list()
         angle = list()
         direction = list()
         curr_frame = data.data[0]
-    
+        data_per_frame = list()
 
 '''
 *
