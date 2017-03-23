@@ -58,10 +58,11 @@ def callback(data):
             width.append((angle_right[0] * math.cos(abs((math.pi/4) - angle_right[1]))) + (angle_left[0] * math.cos(abs((math.pi/4) - angle_left[1]))))
             angle.append((math.pi/4) - min_dist[1])
             direction.append("right" if angle[-1] < 0 else "left")
-        sentence = ""
+        sentence = "sss"
         for i in range(len(width)):
             sentence += "there is a " + str(int(width[i])) + "meter wide object towards your " + direction[i] + "at an angle of " + str(abs(angle[i] * (180 / math.pi))) + "and"
         sentence = sentence[:-4]
+        print sentence
         r = requests.post("http://www.lithics.in/apis/eyic/firebase.php", data={'message':sentence})
         width = list()
         angle = list()
