@@ -36,49 +36,49 @@ val = int()
 '''
 def callback(data):
     global curr_frame, data_per_frame, sentence, width, angle, direction, val
-    # rospy.loginfo("Data.data")
-    # rospy.loginfo(data.data)
+    rospy.loginfo("Data.data")
+    rospy.loginfo(data.data)
 
-    # rospy.loginfo("Data[0]")
-    # rospy.loginfo(data.data[0])
+    rospy.loginfo("Frame Number")
+    rospy.loginfo(data.data[0])
 
     # unpacking the data
-    min_dist = data.data[1:4]
-    angle_right = data.data[4:7]
-    angle_left = data.data[7:10]
+    props_min = data.data[1:4]
+    props_right = data.data[4:7]
+    props_left = data.data[7:10]
 
     if curr_frame == data.data[0]:
         data_per_frame.append(data.data)
     else:
         for dat in data_per_frame:
-            min_dist = dat[1:4]
-            angle_right = dat[4:7]
-            angle_left = dat[7:10]
+            props_min = dat[1:4]
+            props_right = dat[4:7]
+            props_left = dat[7:10]
+            # print (min_dist)
+            # print (angle_left)
+            # print (angle_right)
+            
             # calculates the width of the object using the angle to each of the extreme sides and their distances
-            width.append((angle_right[0] * math.cos(abs((math.pi/4) - angle_right[1]))) + (angle_left[0] * math.cos(abs((math.pi/4) - angle_left[1]))))
-            angle.append((math.pi/4) - min_dist[1])
-            direction.append("right" if angle[-1] < 0 else "left")
-        sentence = "sss"
+            # width.append((angle_right[0] * math.cos(abs((math.pi/4) - angle_right[1]))) + (angle_left[0] * math.cos(abs((math.pi/4) - angle_left[1]))))
+            # angle.append((math.pi/4) - min_dist[1])
+            # direction.append("right" if angle[-1] < 0 else "left")
         for i in range(len(width)):
-<<<<<<< HEAD
-=======
-            sentence += "there is a " + str(int(width[i])) + " meter wide object towards your " + direction[i] + " at an angle of " + str(abs(angle[i] * (180 / math.pi))) + " and "
+            sentence += "there is a " + str(int(width[i])) + " meter wide object towards your " + direction[i] + " at an angle of " + str(angle[i] * (180 / math.pi)) + " and "
         sentence = sentence[:-6]
-        r = requests.get("http://www.lithics.in/apis/eyic/getStatus.php")
+        # r = requests.get("http://www.lithics.in/apis/eyic/getStatus.php")
 
-        rospy.loginfo('r.content')
-        rospy.loginfo(r.content)
-        rospy.loginfo('val')
-        rospy.loginfo(val)
+        # rospy.loginfo('r.content')
+        # rospy.loginfo(r.content)
+        # rospy.loginfo('val')
+        # rospy.loginfo(val)
         
-        if val != int(r.content):
-            print(sentence)
-            rp = requests.post("http://www.lithics.in/apis/eyic/firebase.php", data={'message':sentence})
+        # if val != int(r.content):
+        print(sentence)
+            # rp = requests.post("http://www.lithics.in/apis/eyic/firebase.php", data={'message':sentence})
         
-        val = int(r.content)
+        # val = int(r.content)
         
-        # sentence = ""
->>>>>>> 6e650cc5d311c61ae3196d54ecb876ed5e38aa00
+        sentence = "ssssssss"
         width = list()
         angle = list()
         direction = list()
