@@ -62,6 +62,8 @@ double get_distance(const pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr& msg, int 
 // angles of leftmost point in the cluster
   double max_angle_radx[4] = {0.0, 0.0, 0.0};
   int count=0;
+  const double pi = boost::math::constants::pi<double>();
+
   // int i = 0;
   // Angles are calculated in radians and can convert to degree by multpying it with 180/pi 
   BOOST_FOREACH (const pcl::PointXYZRGB& pt, msg->points){//to iterate trough all the points in the filtered point cloud published by publisher
@@ -69,20 +71,21 @@ double get_distance(const pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr& msg, int 
     if(hypot(pt.z, pt.x) < minDistance[0]){
       // keep updating the minimum Distant point
       minDistance[0] = hypot(pt.z, pt.x);
-      minDistance[1] = atan2(pt.z,pt.x);
-      minDistance[2] = atan2(pt.z, pt.y);
+      // minDistance[1] = atan2(pt.z,pt.x);
+      minDistance[1] = (atan2(pt.x,pt.z));
+      minDistance[2] = (atan2(pt.y, pt.z));
     }
-    if(atan2(pt.z, pt.x) < min_angle_radx[1]){
+    if(atan2(pt.x, pt.z) < min_angle_radx[1]){
       // keep updating the minimum angle
       min_angle_radx[0] = hypot(pt.z, pt.x);
-      min_angle_radx[1] = atan2(pt.z,pt.x);
-      min_angle_radx[2] = atan2(pt.z, pt.y);
+      min_angle_radx[1] = (atan2(pt.x,pt.z));
+      min_angle_radx[2] = (atan2(pt.y, pt.z));
     }
-    else if(atan2(pt.z, pt.x) > max_angle_radx[1]){
+    else if(atan2(pt.x, pt.z) > max_angle_radx[1]){
       // keep updating the maximum angle
       max_angle_radx[0] = hypot(pt.z, pt.x);
-      max_angle_radx[1] = atan2(pt.z,pt.x);
-      max_angle_radx[2] = atan2(pt.z, pt.y);
+      max_angle_radx[1] = (atan2(pt.x,pt.z));
+      max_angle_radx[2] = (atan2(pt.y, pt.z));
     }
   }
   std_msgs::Float64MultiArray arr;
@@ -121,8 +124,12 @@ double get_distance(const pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr& msg, int 
 void 
 cloud_cb (const sensor_msgs::PointCloud2ConstPtr& input)
 {
-  int minClusterSize = 100, maxClusterSize = 25000, maxIterations=100;
-  double leaf_size = 0.05, distanceThreshold = 0.02, clusterTolerance = 0.05;
+	// Leaf size == Distance between 2 pts in the point cloud.
+	// maxClusterSize == Max number of points that are allowed to cluster together.
+	// minClusterSize == Min number of points that should be there to form a cluster
+
+  int minClusterSize = 1000, maxClusterSize = 10000, maxIterations = 100;
+  double leaf_size = 0.01, distanceThreshold = 0.05, clusterTolerance = 0.05;
   
   pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud_f (new pcl::PointCloud<pcl::PointXYZRGB>);
   
