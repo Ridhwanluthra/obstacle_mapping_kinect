@@ -55,15 +55,16 @@ double get_distance(const pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr& msg, int 
 * Example Call:  get_distance (cloud, j)
 *
 */
+  double rad_to_deg = 57.2958;
 
-  double minDistance[4] = {std::numeric_limits<double>::infinity(), std::numeric_limits<double>::infinity(), std::numeric_limits<double>::infinity()};
-// angles of rightmost point in the cluster
-  double min_angle_radx[4] = {std::numeric_limits<double>::infinity(), std::numeric_limits<double>::infinity(), std::numeric_limits<double>::infinity()};
-// angles of leftmost point in the cluster
-  double max_angle_radx[4] = {0.0, 0.0, 0.0};
   int count=0;
   const double pi = boost::math::constants::pi<double>();
 
+  double minDistance[4] = {std::numeric_limits<double>::infinity(), std::numeric_limits<double>::infinity(), 0.0};
+// angles of rightmost point in the cluster
+  double min_angle_radx[4] = {std::numeric_limits<double>::infinity(), std::numeric_limits<double>::infinity(), 0.0};
+// angles of leftmost point in the cluster
+  double max_angle_radx[4] = {0.0, -(std::numeric_limits<double>::infinity()), 0.0};
   // int i = 0;
   // Angles are calculated in radians and can convert to degree by multpying it with 180/pi 
   BOOST_FOREACH (const pcl::PointXYZRGB& pt, msg->points){//to iterate trough all the points in the filtered point cloud published by publisher
@@ -72,35 +73,49 @@ double get_distance(const pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr& msg, int 
       // keep updating the minimum Distant point
       minDistance[0] = hypot(pt.z, pt.x);
       // minDistance[1] = atan2(pt.z,pt.x);
-      minDistance[1] = (atan2(pt.x,pt.z));
-      minDistance[2] = (atan2(pt.y, pt.z));
+      minDistance[1] = (atan2(pt.x,pt.z))*rad_to_deg;
+      minDistance[2] = (atan2(pt.y, pt.z))*rad_to_deg;
     }
-    if(atan2(pt.x, pt.z) < min_angle_radx[1]){
+
+    if(((atan2(pt.x, pt.z))*rad_to_deg) < min_angle_radx[1]){
       // keep updating the minimum angle
       min_angle_radx[0] = hypot(pt.z, pt.x);
-      min_angle_radx[1] = (atan2(pt.x,pt.z));
-      min_angle_radx[2] = (atan2(pt.y, pt.z));
+      min_angle_radx[1] = (atan2(pt.x,pt.z))*rad_to_deg;
+      min_angle_radx[2] = (atan2(pt.y, pt.z))*rad_to_deg;
     }
-    else if(atan2(pt.x, pt.z) > max_angle_radx[1]){
+    if(((atan2(pt.x, pt.z))*rad_to_deg) > max_angle_radx[1]){
       // keep updating the maximum angle
       max_angle_radx[0] = hypot(pt.z, pt.x);
-      max_angle_radx[1] = (atan2(pt.x,pt.z));
-      max_angle_radx[2] = (atan2(pt.y, pt.z));
+      max_angle_radx[1] = (atan2(pt.x,pt.z))*rad_to_deg;
+      max_angle_radx[2] = (atan2(pt.y, pt.z))*rad_to_deg;
     }
   }
-  std_msgs::Float64MultiArray arr;
+  if (minDistance[0]<4)
+  {
+    std::cout<<"-------NEW CLUSTER------"<<std::endl;
+    std::cout<<"MinDistance  "<<minDistance[0]<<"  ";
+    std::cout<<"MinAngleX  "<<minDistance[1]<<"  ";
+    std::cout<<"MinAngleY  "<<minDistance[2]<<std::endl;
+    std::cout<<"LeftDistance  "<<min_angle_radx[0]<<"  ";
+    std::cout<<"LeftAngleX  "<<min_angle_radx[1]<<"  ";
+    std::cout<<"LeftAngleY  "<<min_angle_radx[2]<<std::endl;
+    std::cout<<"RightDistance  "<<max_angle_radx[0]<<"  ";
+    std::cout<<"RightAngleX  "<<max_angle_radx[1]<<"  ";
+    std::cout<<"RightAngleY  "<<max_angle_radx[2]<<std::endl;
+    std_msgs::Float64MultiArray arr;
 
-  arr.data.clear();
-  // serialising for publishing
-  arr.data.push_back(counter);
-  for (int i = 0; i < 3; i++)
-    arr.data.push_back(minDistance[i]);
-  for (int i = 0; i < 3; i++)
-    arr.data.push_back(min_angle_radx[i]);
-  for (int i = 0; i < 3; i++)
-    arr.data.push_back(max_angle_radx[i]);
-  
-  arr_pub.publish(arr);
+    arr.data.clear();
+    // serialising for publishing
+    arr.data.push_back(counter);
+    for (int i = 0; i < 3; i++)
+      arr.data.push_back(minDistance[i]);
+    for (int i = 0; i < 3; i++)
+      arr.data.push_back(min_angle_radx[i]);
+    for (int i = 0; i < 3; i++)
+      arr.data.push_back(max_angle_radx[i]);
+    
+    arr_pub.publish(arr);
+  }
   return minDistance[0];
 }
 
@@ -206,6 +221,7 @@ cloud_cb (const sensor_msgs::PointCloud2ConstPtr& input)
   *cloud_clust_remove = *cloud_filtered;
   pcl::PointCloud<pcl::PointXYZRGB> cloud_xyzrgb;
   double range;
+  std::cout<<"-------NEW FRAME------"<<std::endl<<std::endl;
   for (int it = 0; it < cluster_indices.size(); ++it)
   {
 
@@ -217,7 +233,6 @@ cloud_cb (const sensor_msgs::PointCloud2ConstPtr& input)
     ext.setNegative (false);
     ext.filter (*cloud_f);
     range = get_distance(cloud_f, j);
-    std::cout<<range<<std::endl;
     // to ignore far away clusters for brevity.
     if (range >= 4){
       continue;
