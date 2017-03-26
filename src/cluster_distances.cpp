@@ -31,6 +31,9 @@
 #include <stdio.h>
 #include <limits>
 #include <vector>
+#include <math.h>
+#include <iostream>
+
 
 #include "std_msgs/MultiArrayLayout.h"
 #include "std_msgs/MultiArrayDimension.h"
@@ -42,6 +45,8 @@ using namespace::std;
 ros::Publisher pub, arr_pub;
 
 int j = 0;
+
+int maxDistance = 3;
 
 double get_distance(const pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr& msg, int counter){
 /*
@@ -56,6 +61,8 @@ double get_distance(const pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr& msg, int 
 *
 */
   double rad_to_deg = 57.2958;
+  rad_to_deg = 1;
+
 
   int count=0;
   const double pi = boost::math::constants::pi<double>();
@@ -76,7 +83,7 @@ double get_distance(const pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr& msg, int 
       minDistance[1] = (atan2(pt.x,pt.z))*rad_to_deg;
       minDistance[2] = (atan2(pt.y, pt.z))*rad_to_deg;
     }
-
+    // Angles are not accurately measured. SO, subtract 0.25 m from each distance.
     if(((atan2(pt.x, pt.z))*rad_to_deg) < min_angle_radx[1]){
       // keep updating the minimum angle
       min_angle_radx[0] = hypot(pt.z, pt.x);
@@ -90,7 +97,7 @@ double get_distance(const pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr& msg, int 
       max_angle_radx[2] = (atan2(pt.y, pt.z))*rad_to_deg;
     }
   }
-  if (minDistance[0]<4)
+  if (minDistance[0]<maxDistance)
   {
     std::cout<<"-------NEW CLUSTER------"<<std::endl;
     std::cout<<"MinDistance  "<<minDistance[0]<<"  ";
@@ -105,14 +112,27 @@ double get_distance(const pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr& msg, int 
     std_msgs::Float64MultiArray arr;
 
     arr.data.clear();
-    // serialising for publishing
     arr.data.push_back(counter);
-    for (int i = 0; i < 3; i++)
-      arr.data.push_back(minDistance[i]);
-    for (int i = 0; i < 3; i++)
-      arr.data.push_back(min_angle_radx[i]);
-    for (int i = 0; i < 3; i++)
-      arr.data.push_back(max_angle_radx[i]);
+    bool sign1 =  min_angle_radx[1] < 0;
+    bool sign2 =  max_angle_radx[1] < 0;
+    double width = 0.0;
+    if ((sign1 && sign2) || (!sign1 && !sign2))
+    {
+      width = abs(min_angle_radx[0]*sin(abs(min_angle_radx[1])) - max_angle_radx[0]*sin(abs(max_angle_radx[1])));
+    }else{
+      width = abs(min_angle_radx[0]*sin(abs(min_angle_radx[1])) + max_angle_radx[0]*sin(abs(max_angle_radx[1])));
+    }
+    std::cout<<"Width  "<< width <<std::endl;
+    arr.data.push_back(width);
+    arr.data.push_back(minDistance[1]);
+    // serialising for publishing
+    // arr.data.push_back(counter);
+    // for (int i = 0; i < 3; i++)
+    //   arr.data.push_back(minDistance[i]);
+    // for (int i = 0; i < 3; i++)
+    //   arr.data.push_back(min_angle_radx[i]);
+    // for (int i = 0; i < 3; i++)
+    //   arr.data.push_back(max_angle_radx[i]);
     
     arr_pub.publish(arr);
   }
@@ -143,9 +163,9 @@ cloud_cb (const sensor_msgs::PointCloud2ConstPtr& input)
 	// maxClusterSize == Max number of points that are allowed to cluster together.
 	// minClusterSize == Min number of points that should be there to form a cluster
 
-  int minClusterSize = 1000, maxClusterSize = 10000, maxIterations = 100;
-  double leaf_size = 0.01, distanceThreshold = 0.05, clusterTolerance = 0.05;
-  
+  int minClusterSize = 100, maxClusterSize = 200, maxIterations = 150;
+  double leaf_size = 0.05, distanceThreshold = 0.01, clusterTolerance = 0.05;
+
   pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud_f (new pcl::PointCloud<pcl::PointXYZRGB>);
   
   pcl::PCLPointCloud2* cloud_blob = new pcl::PCLPointCloud2; 
@@ -234,7 +254,7 @@ cloud_cb (const sensor_msgs::PointCloud2ConstPtr& input)
     ext.filter (*cloud_f);
     range = get_distance(cloud_f, j);
     // to ignore far away clusters for brevity.
-    if (range >= 4){
+    if (range >= maxDistance){
       continue;
     }
     cloud_xyzrgb = *cloud_f;
@@ -265,6 +285,7 @@ main (int argc, char** argv)
   // Initialize ROS
   ros::init (argc, argv, "cluster_dist");
   ros::NodeHandle nh;
+
 
   // Create a ROS subscriber for the input point cloud
   ros::Subscriber sub = nh.subscribe ("input", 1, cloud_cb);
