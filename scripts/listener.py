@@ -36,11 +36,11 @@ val = int()
 '''
 def callback(data):
     global curr_frame, data_per_frame, sentence, width, angle, direction, val
-    rospy.loginfo("Data.data")
-    rospy.loginfo(data.data)
+    # rospy.loginfo("Data.data")
+    # rospy.loginfo(data.data)
 
-    rospy.loginfo("Frame Number")
-    rospy.loginfo(data.data[0])
+    # rospy.loginfo("Frame Number")
+    # rospy.loginfo(data.data[0])
 
     # unpacking the data
     props_min = data.data[1:4]
@@ -73,12 +73,12 @@ def callback(data):
         # rospy.loginfo(val)
         
         # if val != int(r.content):
-        print(sentence)
+        # print(sentence)
             # rp = requests.post("http://www.lithics.in/apis/eyic/firebase.php", data={'message':sentence})
         
         # val = int(r.content)
         
-        sentence = "ssssssss"
+        sentence = ""
         width = list()
         angle = list()
         direction = list()
