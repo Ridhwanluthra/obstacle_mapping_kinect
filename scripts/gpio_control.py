@@ -70,4 +70,15 @@ def reset():
 
 # runs the listener function if the file is run as a script
 if __name__ == '__main__':
+    print ("HIGH!")
     switch_on(pin3)
+    sleep(2)
+    reset()
+    print ("HIGH!")
+    switch_on(pin2)
+    sleep(2)
+    reset()
+    print ("HIGH!")
+    switch_on(pin1)
+    sleep(2)
+    reset()
