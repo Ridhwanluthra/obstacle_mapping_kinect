@@ -17,11 +17,13 @@ from time import sleep
 
 curr_frame = 0
 data_per_frame = list()
-prev_frame = 0
 
 sentence = ""
 width = list()
-angle = list()
+minDistance = list()
+min_angle = list()
+left_most = list()
+right_most = list()
 direction = list()
 # send_data = bool()
 val = int()
@@ -35,48 +37,43 @@ val = int()
 *
 '''
 def callback(data):
-    global curr_frame, data_per_frame, sentence, width, angle, direction, val
-    # rospy.loginfo("Data.data")
-    # rospy.loginfo(data.data)
+    global val, curr_frame, data_per_frame, sentence, width, minDistance, min_angle, left_most, right_most, direction
 
-    # rospy.loginfo("Frame Number")
-    # rospy.loginfo(data.data[0])
-
-    # unpacking the data
-    props_min = data.data[1:4]
-    props_right = data.data[4:7]
-    props_left = data.data[7:10]
+    counter = data.data[0]
+    current_width = (data.data[1])
+    currentMinDistance = (data.data[2])
+    current_min_angle = (data.data[3])
+    current_left_most = (data.data[4])
+    current_right_most = (data.data[5])
 
     if curr_frame == data.data[0]:
         data_per_frame.append(data.data)
     else:
         for dat in data_per_frame:
-            props_min = dat[1:4]
-            props_right = dat[4:7]
-            props_left = dat[7:10]
-            # print (min_dist)
-            # print (angle_left)
-            # print (angle_right)
+            width.append(round(dat[1], 2))
+            minDistance.append(round(dat[2], 2))
+            min_angle.append(round(dat[3], 2))
+            left_most.append(round(dat[4], 2))
+            right_most.append(round(dat[5], 2))
             
-            # calculates the width of the object using the angle to each of the extreme sides and their distances
-            # width.append((angle_right[0] * math.cos(abs((math.pi/4) - angle_right[1]))) + (angle_left[0] * math.cos(abs((math.pi/4) - angle_left[1]))))
-            # angle.append((math.pi/4) - min_dist[1])
-            # direction.append("right" if angle[-1] < 0 else "left")
+            direction.append("right" if min_angle[-1] > 0 else "left")
         for i in range(len(width)):
-            sentence += "there is a " + str(int(width[i])) + " meter wide object towards your " + direction[i] + " at an angle of " + str(angle[i] * (180 / math.pi)) + " and "
-        sentence = sentence[:-6]
-        # r = requests.get("http://www.lithics.in/apis/eyic/getStatus.php")
+        	if width > 0.0:
+            	sentence += "there is a " + str(width[i]) + " meter wide object towards your " + direction[i] + " at an angle of " + str(round(abs(min_angle[i] * (180 / math.pi)), 2)) + " and "
+        if len(sentence)>6:
+	        sentence = sentence[:-6]
+	        r = requests.get("http://www.lithics.in/apis/eyic/getStatus.php")
 
-        # rospy.loginfo('r.content')
-        # rospy.loginfo(r.content)
-        # rospy.loginfo('val')
-        # rospy.loginfo(val)
-        
-        # if val != int(r.content):
-        # print(sentence)
-            # rp = requests.post("http://www.lithics.in/apis/eyic/firebase.php", data={'message':sentence})
-        
-        # val = int(r.content)
+	        # rospy.loginfo('r.content')
+	        # rospy.loginfo(r.content)
+	        # rospy.loginfo('val')
+	        # rospy.loginfo(val)
+	        
+	        if val != int(r.content):
+	        	print(sentence)
+	            rp = requests.post("http://www.lithics.in/apis/eyic/firebase.php", data={'message':sentence})
+	        
+	        val = int(r.content)
         
         sentence = ""
         width = list()
