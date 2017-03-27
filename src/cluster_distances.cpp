@@ -63,8 +63,6 @@ double get_distance(const pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr& msg, int 
   double rad_to_deg = 57.2958;
   rad_to_deg = 1;
 
-
-  int count=0;
   const double pi = boost::math::constants::pi<double>();
 
   double minDistance[4] = {std::numeric_limits<double>::infinity(), std::numeric_limits<double>::infinity(), 0.0};
@@ -112,7 +110,6 @@ double get_distance(const pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr& msg, int 
     std_msgs::Float64MultiArray arr;
 
     arr.data.clear();
-    arr.data.push_back(counter);
     bool sign1 =  min_angle_radx[1] < 0;
     bool sign2 =  max_angle_radx[1] < 0;
     double width = 0.0;
@@ -123,16 +120,12 @@ double get_distance(const pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr& msg, int 
       width = abs(min_angle_radx[0]*sin(abs(min_angle_radx[1])) + max_angle_radx[0]*sin(abs(max_angle_radx[1])));
     }
     std::cout<<"Width  "<< width <<std::endl;
+    arr.data.push_back(counter);
     arr.data.push_back(width);
     arr.data.push_back(minDistance[1]);
-    // serialising for publishing
-    // arr.data.push_back(counter);
-    // for (int i = 0; i < 3; i++)
-    //   arr.data.push_back(minDistance[i]);
-    // for (int i = 0; i < 3; i++)
-    //   arr.data.push_back(min_angle_radx[i]);
-    // for (int i = 0; i < 3; i++)
-    //   arr.data.push_back(max_angle_radx[i]);
+    arr.data.push_back(minDistance[2]);
+    arr.data.push_back(min_angle_radx[1]);
+    arr.data.push_back(max_angle_radx[1]);
     
     arr_pub.publish(arr);
   }
