@@ -22,9 +22,8 @@ sentence = ""
 width = list()
 minDistance = list()
 min_angle = list()
-left_most = list()
-right_most = list()
 direction = list()
+height = list()
 # send_data = bool()
 val = int()
 '''
@@ -37,7 +36,7 @@ val = int()
 *
 '''
 def callback(data):
-    global val, curr_frame, data_per_frame, sentence, width, minDistance, min_angle, left_most, right_most, direction
+    global val, curr_frame, data_per_frame, sentence, width, minDistance, min_angle, direction, height
 
     counter = data.data[0]
     current_width = (data.data[1])
@@ -46,6 +45,7 @@ def callback(data):
     current_left_most = (data.data[4])
     current_right_most = (data.data[5])
     print ("sdsds")
+
     if curr_frame == data.data[0]:
         data_per_frame.append(data.data)
     else:
@@ -53,8 +53,7 @@ def callback(data):
             width.append(round(dat[1], 2))
             minDistance.append(round(dat[2], 2))
             min_angle.append(round(dat[3], 2))
-            left_most.append(round(dat[4], 2))
-            right_most.append(round(dat[5], 2))
+            height.append(round(dat[4], 2))
             
             direction.append("right" if min_angle[-1] > 0 else "left")
         for i in range(len(width)):
