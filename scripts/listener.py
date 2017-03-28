@@ -22,9 +22,8 @@ sentence = ""
 width = list()
 minDistance = list()
 min_angle = list()
-left_most = list()
-right_most = list()
 direction = list()
+height = list()
 # send_data = bool()
 val = int()
 '''
@@ -37,14 +36,13 @@ val = int()
 *
 '''
 def callback(data):
-    global val, curr_frame, data_per_frame, sentence, width, minDistance, min_angle, left_most, right_most, direction
+    global val, curr_frame, data_per_frame, sentence, width, minDistance, min_angle, direction, height
 
     counter = data.data[0]
     current_width = (data.data[1])
     currentMinDistance = (data.data[2])
     current_min_angle = (data.data[3])
-    current_left_most = (data.data[4])
-    current_right_most = (data.data[5])
+    current_height = (data.data[4])
 
     if curr_frame == data.data[0]:
         data_per_frame.append(data.data)
@@ -53,13 +51,12 @@ def callback(data):
             width.append(round(dat[1], 2))
             minDistance.append(round(dat[2], 2))
             min_angle.append(round(dat[3], 2))
-            left_most.append(round(dat[4], 2))
-            right_most.append(round(dat[5], 2))
+            height.append(round(dat[4], 2))
             
             direction.append("right" if min_angle[-1] > 0 else "left")
         for i in range(len(width)):
-        	if width > 0.0:
-                    sentence += "there is a " + str(width[i]) + " meter wide object towards your " + direction[i] + " at an angle of " + str(round(abs(min_angle[i] * (180 / math.pi)), 2)) + " and "
+            if width[i] > 0.0 and height[i] > 0.2:
+                sentence += "there is a " + str(width[i]) + " meter wide object at a distance of " + str(minDistance[i]) + " meters towards your " + direction[i] + " at an angle of " + str(round(abs(min_angle[i] * (180 / math.pi)), 2)) + " degrees  and "
         if len(sentence)>6:            
             sentence = sentence[:-6]
             r = requests.get("http://www.lithics.in/apis/eyic/getStatus.php")

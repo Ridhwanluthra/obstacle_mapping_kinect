@@ -68,8 +68,12 @@ double get_distance(const pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr& msg, int 
   double minDistance[4] = {std::numeric_limits<double>::infinity(), std::numeric_limits<double>::infinity(), 0.0};
 // angles of rightmost point in the cluster
   double min_angle_radx[4] = {std::numeric_limits<double>::infinity(), std::numeric_limits<double>::infinity(), 0.0};
+
+  double min_angle_rady[4] = {std::numeric_limits<double>::infinity(), std::numeric_limits<double>::infinity(), 0.0};
 // angles of leftmost point in the cluster
   double max_angle_radx[4] = {0.0, -(std::numeric_limits<double>::infinity()), 0.0};
+
+  double max_angle_rady[4] = {0.0, -(std::numeric_limits<double>::infinity()), 0.0};
   // int i = 0;
   // Angles are calculated in radians and can convert to degree by multpying it with 180/pi 
   BOOST_FOREACH (const pcl::PointXYZRGB& pt, msg->points){//to iterate trough all the points in the filtered point cloud published by publisher
@@ -88,11 +92,24 @@ double get_distance(const pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr& msg, int 
       min_angle_radx[1] = (atan2(pt.x,pt.z))*rad_to_deg;
       min_angle_radx[2] = (atan2(pt.y, pt.z))*rad_to_deg;
     }
+    
     if(((atan2(pt.x, pt.z))*rad_to_deg) > max_angle_radx[1]){
       // keep updating the maximum angle
       max_angle_radx[0] = hypot(pt.z, pt.x);
       max_angle_radx[1] = (atan2(pt.x,pt.z))*rad_to_deg;
       max_angle_radx[2] = (atan2(pt.y, pt.z))*rad_to_deg;
+    }
+    if(((atan2(pt.y, pt.z))*rad_to_deg) < min_angle_radx[2]){
+      // keep updating the maximum angle
+      min_angle_rady[0] = hypot(pt.z, pt.x);
+      min_angle_rady[1] = (atan2(pt.x,pt.z))*rad_to_deg;
+      min_angle_rady[2] = (atan2(pt.y, pt.z))*rad_to_deg;
+    }
+    if(((atan2(pt.y, pt.z))*rad_to_deg) > max_angle_radx[2]){
+      // keep updating the maximum angle
+      max_angle_rady[0] = hypot(pt.z, pt.x);
+      max_angle_rady[1] = (atan2(pt.x,pt.z))*rad_to_deg;
+      max_angle_rady[2] = (atan2(pt.y, pt.z))*rad_to_deg;
     }
   }
   if (minDistance[0]<maxDistance)
@@ -120,12 +137,25 @@ double get_distance(const pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr& msg, int 
       width = abs(min_angle_radx[0]*sin(abs(min_angle_radx[1])) + max_angle_radx[0]*sin(abs(max_angle_radx[1])));
     }
     std::cout<<"Width  "<< width <<std::endl;
+
+    sign1 =  min_angle_rady[2] < 0;
+    sign2 =  max_angle_rady[2] < 0;
+    double height = 0.0;
+    if ((sign1 && sign2) || (!sign1 && !sign2))
+    {
+      height = abs(min_angle_rady[0]*sin(abs(min_angle_rady[2])) - max_angle_rady[0]*sin(abs(max_angle_rady[2])));
+    }else{
+      height = abs(min_angle_rady[0]*sin(abs(min_angle_rady[2])) + max_angle_rady[0]*sin(abs(max_angle_rady[2])));
+    }
+    std::cout<<"Height  "<< height <<std::endl;
+
     arr.data.push_back(counter);
     arr.data.push_back(width);
+    // distance of nearest point in cluster
+    arr.data.push_back(minDistance[0]);
+    // angle in xy plane of nearest point in cluster
     arr.data.push_back(minDistance[1]);
-    arr.data.push_back(minDistance[2]);
-    arr.data.push_back(min_angle_radx[1]);
-    arr.data.push_back(max_angle_radx[1]);
+    arr.data.push_back(height);
     
     arr_pub.publish(arr);
   }
