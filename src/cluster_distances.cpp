@@ -147,7 +147,7 @@ double get_distance(const pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr& msg, int 
     }else{
       height = abs(min_angle_rady[0]*sin(abs(min_angle_rady[2])) + max_angle_rady[0]*sin(abs(max_angle_rady[2])));
     }
-    std::cout<<"Height  "<< height <<std::endl;
+    // std::cout<<"Height  "<< height <<std::endl;
 
     arr.data.push_back(counter);
     arr.data.push_back(width);
