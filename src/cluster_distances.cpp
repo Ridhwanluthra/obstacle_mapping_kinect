@@ -68,11 +68,11 @@ double get_distance(const pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr& msg, int 
   double minDistance[4] = {std::numeric_limits<double>::infinity(), std::numeric_limits<double>::infinity(), 0.0};
 // angles of rightmost point in the cluster
   double min_angle_radx[4] = {std::numeric_limits<double>::infinity(), std::numeric_limits<double>::infinity(), 0.0};
-
+// angles of bottommost point in the cluster
   double min_angle_rady[4] = {std::numeric_limits<double>::infinity(), std::numeric_limits<double>::infinity(), 0.0};
 // angles of leftmost point in the cluster
   double max_angle_radx[4] = {0.0, -(std::numeric_limits<double>::infinity()), 0.0};
-
+// angles of topmost point in the cluster
   double max_angle_rady[4] = {0.0, -(std::numeric_limits<double>::infinity()), 0.0};
   // int i = 0;
   // Angles are calculated in radians and can convert to degree by multpying it with 180/pi 
@@ -155,7 +155,10 @@ double get_distance(const pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr& msg, int 
     arr.data.push_back(minDistance[0]);
     // angle in xy plane of nearest point in cluster
     arr.data.push_back(minDistance[1]);
-    arr.data.push_back(height);
+    // arr.data.push_back(height);
+    arr.data.push_back(minDistance[1]);
+    arr.data.push_back(min_angle_radx[1]);
+    arr.data.push_back(max_angle_radx[1]);
     
     arr_pub.publish(arr);
   }
