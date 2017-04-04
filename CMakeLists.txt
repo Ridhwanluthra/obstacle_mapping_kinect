@@ -213,3 +213,6 @@ target_link_libraries(cluster_distances ${catkin_LIBRARIES})
 
 #add_executable(remove_floor src/remove_floor.cpp)
 #target_link_libraries(remove_floor ${catkin_LIBRARIES})
+
+add_executable(convert_pointcloud_to_image src/convert_pointcloud_to_image.cpp)
+target_link_libraries(convert_pointcloud_to_image ${catkin_LIBRARIES})

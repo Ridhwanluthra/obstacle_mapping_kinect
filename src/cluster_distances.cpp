@@ -42,7 +42,7 @@
 
 using namespace::std;
 
-ros::Publisher pub, arr_pub;
+ros::Publisher pub, arr_pub, voxel_pub;
 
 int j = 0;
 
@@ -197,10 +197,7 @@ cloud_cb (const sensor_msgs::PointCloud2ConstPtr& input)
 
   pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud_filtered_planar (new pcl::PointCloud<pcl::PointXYZRGB>);
 
-  pcl_conversions::toPCL(*input, *cloud_blob);
-
-  
-
+  pcl_conversions::toPCL(*input, *cloud_blob);  
   
   pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud_filtered (new pcl::PointCloud<pcl::PointXYZRGB>);
   // Perform the actual filtering
@@ -208,6 +205,8 @@ cloud_cb (const sensor_msgs::PointCloud2ConstPtr& input)
   sor.setInputCloud (cloudPtr);
   sor.setLeafSize (leaf_size, leaf_size, leaf_size);
   sor.filter (cloud_filtered_blob);
+
+  voxel_pub.publish(cloud_filtered_blob);
 
   pcl::fromPCLPointCloud2 (cloud_filtered_blob, *cloud_filtered);
 
@@ -315,6 +314,8 @@ main (int argc, char** argv)
 
   // Create a ROS publisher for the output point cloud
   pub = nh.advertise<sensor_msgs::PointCloud2> ("output", 1);
+
+  voxel_pub = nh.advertise<sensor_msgs::PointCloud2> ("voxeled", 1);
 
   // publishing  details
   arr_pub = nh.advertise<std_msgs::Float64MultiArray> ("cluster_distances", 10);
