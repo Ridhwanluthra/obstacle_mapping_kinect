@@ -58,10 +58,15 @@ def callback(data):
                 width.append(round(dat[1], 2))
                 minDistance.append(round(dat[2], 2))
                 min_angle.append(round(dat[3], 2))
+                print ("MINANGLE")
+                print (round(dat[3], 2))
                 left_most.append(round(dat[4], 2))
                 right_most.append(round(dat[5], 2))
                 direction.append("right" if min_angle[-1] > 0 else "left")
             for i in range(len(width)):
+                print (i)
+                print (abs(min_angle[i] * (180 / math.pi)))
+                print (min_angle[i])
                 if width > 0.0:
                     if abs(min_angle[i] * (180 / math.pi)) < 20:
                         print('center')
