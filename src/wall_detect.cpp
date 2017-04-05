@@ -9,7 +9,6 @@
 */
 #include <ros/ros.h>
 #include <sensor_msgs/PointCloud2.h>
-#include <sensor_msgs/Image.h>
 
 #include <pcl_conversions/pcl_conversions.h>
 #include <pcl/point_cloud.h>
@@ -41,9 +40,16 @@
 
 #include "std_msgs/Float64MultiArray.h"
 
+
+
+#include <pcl/sample_consensus/ransac.h>
+#include <pcl/sample_consensus/sac_model_normal_plane.h>
+#include <pcl/sample_consensus/sac_model_plane.h>
+
+
 using namespace::std;
 
-ros::Publisher pub, arr_pub, voxel_pub, image_pub;
+ros::Publisher pub, arr_pub, voxel_pub;
 
 int j = 0;
 
@@ -192,7 +198,7 @@ cloud_cb (const sensor_msgs::PointCloud2ConstPtr& input)
 
   pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud_f (new pcl::PointCloud<pcl::PointXYZRGB>);
   
-  pcl::PCLPointCloud2* cloud_blob = new pcl::PCLPointCloud2;
+  pcl::PCLPointCloud2* cloud_blob = new pcl::PCLPointCloud2; 
   pcl::PCLPointCloud2ConstPtr cloudPtr(cloud_blob);
   pcl::PCLPointCloud2 cloud_filtered_blob;
 
@@ -245,79 +251,35 @@ cloud_cb (const sensor_msgs::PointCloud2ConstPtr& input)
     *cloud_filtered = *cloud_f;
   }
 
-  // Creating the KdTree object for the search method of the extraction
-  pcl::search::KdTree<pcl::PointXYZRGB>::Ptr tree (new pcl::search::KdTree<pcl::PointXYZRGB>);
-  tree->setInputCloud (cloud_filtered);
+  // pcl::SampleConsensusModelNormalPlane<pcl::PointXYZRGB, pcl::Normal> sac_model;
 
-  std::vector<pcl::PointIndices> cluster_indices;
-  pcl::EuclideanClusterExtraction<pcl::PointXYZRGB> ec;
-  ec.setClusterTolerance (clusterTolerance);
-  ec.setMinClusterSize (minClusterSize);
-  ec.setMaxClusterSize (maxClusterSize);
-  ec.setSearchMethod (tree);
-  ec.setInputCloud (cloud_filtered);
-  ec.extract (cluster_indices);
+  pcl::PointCloud<pcl::Normal>::Ptr normals_out (new pcl::PointCloud<pcl::Normal>);
+  pcl::IntegralImageNormalEstimation<pcl::PointXYZRGB, pcl::Normal> norm_est;
+  // Specify method for normal estimation
+  norm_est.setNormalEstimationMethod (ne.AVERAGE_3D_GRADIENT);
+  // Specify max depth change factor
+  norm_est.setMaxDepthChangeFactor(0.02f);
+  // Specify smoothing area size
+  norm_est.setNormalSmoothingSize(10.0f);
+  // Set the input points
+  norm_est.setInputCloud (points);
+  // Estimate the surface normals and
+  // store the result in "normals_out"
+  norm_est.compute (*normals_out);
 
-  pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud_clust_remove (new pcl::PointCloud<pcl::PointXYZRGB>);
-  pcl::PCLPointCloud2 cloud_final;
-  pcl::PCLPointCloud2 temp;
-  *cloud_clust_remove = *cloud_filtered;
-  pcl::PointCloud<pcl::PointXYZRGB> cloud_xyzrgb;
-  double range;
+  // Create a shared plane model pointer directly
+  pcl::SampleConsensusModelNormalPlane<PointXYZRGB, pcl::Normal>::Ptr model (new SampleConsensusModelNormalPlane<PointXYZ, pcl::Normal> (*cloud_filtered));
+  // Set normals
+  model->setInputNormals(normals);
+  // Set the normal angular distance weight.
+  model->setNormalDistanceWeight(0.5f);
+  // Create the RANSAC object
+  RandomSampleConsensus<PointXYZRGB> sac (model, 0.03);
+  // perform the segmenation step
+  bool result = sac.computeModel ();
 
-  pcl::fromPCLPointCloud2(*cloud_blob, *cloud_clust_remove);
-  
-  std::cout<<"-------NEW FRAME------"<<std::endl<<std::endl;
-  for (int it = 0; it < cluster_indices.size(); ++it)
-  {
 
-    // Extract the planar inliers from the input cloud
-    pcl::ExtractIndices<pcl::PointXYZRGB> ext;
-    ext.setInputCloud (cloud_clust_remove);
-    ext.setIndices(boost::shared_ptr<pcl::PointIndices> (new pcl::PointIndices(cluster_indices[it])));
-    // to extract just the cluster
-    ext.setNegative (false);
-    ext.filter (*cloud_f);
-    range = get_distance(cloud_f, j);
-    // to ignore far away clusters for brevity.
-    if (range >= maxDistance){
-      continue;
-    }
-    cloud_xyzrgb = *cloud_f;
-
-    // iteratively colors the cluster red, green or blue.
-    // for (size_t i = 0; i < cloud_xyzrgb.points.size(); i++) {
-    //   if (it % 3 == 0) {
-    //     cloud_xyzrgb.points[i].r = 255;
-    //   }
-    //   else if (it % 3 == 1) {
-    //     cloud_xyzrgb.points[i].g = 255;
-    //   }
-    //   else if (it % 3 == 2) {
-    //     cloud_xyzrgb.points[i].b = 255;  
-    //   }
-    // }
-
-    pcl::toPCLPointCloud2 (cloud_xyzrgb, temp);
-    pcl::concatenatePointCloud(cloud_final, temp, cloud_final);
-  }
-  j++;
   // pub.publish (cloud_final);
-  std::cout<<"outside now"<<std::endl;
-
-  sensor_msgs::PointCloud2* pt_cloud = new sensor_msgs::PointCloud2;
-
-  pcl::PCLPointCloud2* pt_cl(&cloud_final);
-
-  pcl_conversions::fromPCL(*pt_cl, *pt_cloud);
-  pub.publish(*pt_cloud);
-
-  sensor_msgs::Image image;
-
-  // pcl::toROSMsg (*pt_cloud, image);
-  
-  // image_pub.publish(image);
-
 }
 
 int
@@ -338,8 +300,7 @@ main (int argc, char** argv)
 
   // publishing  details
   arr_pub = nh.advertise<std_msgs::Float64MultiArray> ("cluster_distances", 10);
-  
-  image_pub = nh.advertise<sensor_msgs::Image> ("image_out", 30);
+  // pub = 
 
   // Spin
   ros::spin ();

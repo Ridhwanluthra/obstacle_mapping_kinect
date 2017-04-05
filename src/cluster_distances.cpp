@@ -186,8 +186,8 @@ cloud_cb (const sensor_msgs::PointCloud2ConstPtr& input)
 	// maxClusterSize == Max number of points that are allowed to cluster together.
 	// minClusterSize == Min number of points that should be there to form a cluster
 
-  int minClusterSize = 100, maxClusterSize = 200, maxIterations = 150;
-  double leaf_size = 0.05, distanceThreshold = 0.01, clusterTolerance = 0.05;
+  int minClusterSize = 100000, maxClusterSize = 25000000, maxIterations = 100;
+  double leaf_size = 0.01f, distanceThreshold = 0.02, clusterTolerance = 0.02;
 
   pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud_f (new pcl::PointCloud<pcl::PointXYZRGB>);
   
@@ -276,9 +276,9 @@ cloud_cb (const sensor_msgs::PointCloud2ConstPtr& input)
     ext.filter (*cloud_f);
     range = get_distance(cloud_f, j);
     // to ignore far away clusters for brevity.
-    if (range >= maxDistance){
-      continue;
-    }
+    // if (range >= maxDistance){
+    //   continue;
+    // }
     cloud_xyzrgb = *cloud_f;
 
     // iteratively colors the cluster red, green or blue.
