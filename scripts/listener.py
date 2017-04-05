@@ -42,7 +42,9 @@ def callback(data):
     current_width = (data.data[1])
     currentMinDistance = (data.data[2])
     current_min_angle = (data.data[3])
-    current_height = (data.data[4])
+    current_left_most = (data.data[4])
+    current_right_most = (data.data[5])
+    print ("sdsds")
 
     if curr_frame == data.data[0]:
         data_per_frame.append(data.data)
@@ -55,9 +57,10 @@ def callback(data):
             
             direction.append("right" if min_angle[-1] > 0 else "left")
         for i in range(len(width)):
-            if width[i] > 0.0 and height[i] > 0.2:
-                sentence += "there is a " + str(width[i]) + " meter wide object at a distance of " + str(minDistance[i]) + " meters towards your " + direction[i] + " at an angle of " + str(round(abs(min_angle[i] * (180 / math.pi)), 2)) + " degrees  and "
-        if len(sentence)>6:            
+        	if width > 0.0:
+                    sentence += "there is a " + str(width[i]) + " meter wide object "  + " towards your " + direction[i] + " at an angle of " + str(round(abs(min_angle[i] * (180 / math.pi)), 2)) + " degrees   and "
+        if len(sentence)>6:
+            print ("222sdsds")
             sentence = sentence[:-6]
             r = requests.get("http://www.lithics.in/apis/eyic/getStatus.php")
 
@@ -65,7 +68,9 @@ def callback(data):
             # rospy.loginfo(r.content)
             # rospy.loginfo('val')
             # rospy.loginfo(val)
-            
+            print ("333sdsds")
+            print (r.content)
+            print (val)
             if val != int(r.content):
                 print(sentence)
                 rp = requests.post("http://www.lithics.in/apis/eyic/firebase.php", data={'message':sentence})
