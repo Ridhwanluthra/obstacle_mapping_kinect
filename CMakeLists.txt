@@ -202,8 +202,8 @@ include_directories(
 ## Add folders to be run by python nosetests
 # catkin_add_nosetests(test)
 
-#add_executable(cluster_distances src/cluster_distances.cpp)
-#target_link_libraries(cluster_distances ${catkin_LIBRARIES})
+add_executable(cluster_distances src/cluster_distances.cpp)
+target_link_libraries(cluster_distances ${catkin_LIBRARIES})
 
 #add_executable(cluster_extraction src/cluster_extraction.cpp)
 #target_link_libraries(cluster_extraction ${catkin_LIBRARIES})
@@ -225,3 +225,6 @@ target_link_libraries(wall_detect ${catkin_LIBRARIES})
 
 #add_executable(test_pcl src/test_pcl.cpp)
 #target_link_libraries(test_pcl ${catkin_LIBRARIES})
+
+add_executable(dom_segmentation src/dom_segmentation.cpp)
+target_link_libraries(dom_segmentation ${catkin_LIBRARIES})

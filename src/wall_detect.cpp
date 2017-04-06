@@ -90,57 +90,40 @@ void detect_wall(pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud_blob){
 void 
 cloud_cb (const sensor_msgs::PointCloud2ConstPtr& input)
 {
-  std::cout<<"hey"<<std::endl;
+  // std::cout<<"hey"<<std::endl;
   pcl::PCLPointCloud2* cloud_blob = new pcl::PCLPointCloud2;
   pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud (new pcl::PointCloud<pcl::PointXYZRGB>);
   pcl_conversions::toPCL(*input, *cloud_blob);
   pcl::fromPCLPointCloud2 (*cloud_blob, *cloud);
-  std::vector<int> mapping;
-  pcl::removeNaNFromPointCloud(*cloud, *cloud, mapping);
-  detect_wall(cloud);
+  // std::vector<int> mapping;
+  // pcl::removeNaNFromPointCloud(*cloud, *cloud, mapping);
+  // detect_wall(cloud);
   // pub.publish(*input);
   // ROS_INFO_STREAM("HEY");
 
-  // pcl::PCLPointCloud2* cloud_blob = new pcl::PCLPointCloud2;
-  // pcl::PCLPointCloud2ConstPtr cloudPtr(cloud_blob);
-  // pcl::PCLPointCloud2 cloud_filtered_blob;
-
-  // pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud_filtered_planar (new pcl::PointCloud<pcl::PointXYZRGB>);
-
-  // pcl_conversions::toPCL(*input, *cloud_blob);
-  
-  // pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud_filtered (new pcl::PointCloud<pcl::PointXYZRGB>);
-  // // Perform the actual filtering
-  // pcl::VoxelGrid<pcl::PCLPointCloud2> sor;
-  // sor.setInputCloud (cloudPtr);
-  // float leaf_size = 0.1;
-  // sor.setLeafSize (leaf_size, leaf_size, leaf_size);
-  // sor.filter (cloud_filtered_blob);
-
-  // voxel_pub.publish(cloud_filtered_blob);
-
-
 
   // estimate normals
-  // pcl::PointCloud<pcl::Normal>::Ptr normals (new pcl::PointCloud<pcl::Normal>);
+  pcl::PointCloud<pcl::Normal>::Ptr normals (new pcl::PointCloud<pcl::Normal>);
 
-  // pcl::IntegralImageNormalEstimation<pcl::PointXYZ, pcl::Normal> ne;
-  // ne.setNormalEstimationMethod (ne.AVERAGE_3D_GRADIENT);
-  // ne.setMaxDepthChangeFactor(0.02f);
-  // ne.setNormalSmoothingSize(10.0f);
-  // ne.setInputCloud(cloud);
-  // ne.compute(*normals);
-  // std::cout<<"hey"<<std::endl;
+  pcl::IntegralImageNormalEstimation<pcl::PointXYZRGB, pcl::Normal> ne;
+  ne.setNormalEstimationMethod (ne.AVERAGE_3D_GRADIENT);
+  ne.setMaxDepthChangeFactor(0.02f);
+  ne.setNormalSmoothingSize(10.0f);
+  ne.setInputCloud(cloud);
+  ne.compute(*normals);
 
-  // visualize normals
-  // pcl::visualization::PCLVisualizer viewer("PCL Viewer");
-  // viewer.setBackgroundColor (0.0, 0.0, 0.5);
-  // viewer.addPointCloudNormals<pcl::PointXYZ,pcl::Normal>(cloud, normals);
+  // Create a shared plane model pointer directly
+  pcl::SampleConsensusModelNormalPlane<pcl::PointXYZRGB, pcl::Normal>::Ptr model (new pcl::SampleConsensusModelNormalPlane<pcl::PointXYZRGB, pcl::Normal> (cloud));
+  // Set normals
+  model->setInputNormals(normals);
+  // Set the normal angular distance weight.
+  model->setNormalDistanceWeight(0.5f);
+  // Create the RANSAC object
+  pcl::RandomSampleConsensus<pcl::PointXYZRGB> sac (model, 0.03);
+  // perform the segmenation step
+  bool result = sac.computeModel ();
 
-  // while (!viewer.wasStopped ())
-  // {
-  //  viewer.spinOnce ();
-  // }
+  cout<<result<<endl;
 
 
 	// // Leaf size == Distance between 2 pts in the point cloud.

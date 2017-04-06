@@ -210,7 +210,7 @@ cloud_cb (const sensor_msgs::PointCloud2ConstPtr& input)
 	// minClusterSize == Min number of points that should be there to form a cluster
 
   int minClusterSize = 100, maxClusterSize = 300, maxIterations = 150;
-  double leaf_size = 0.03, distanceThreshold = 0.01, clusterTolerance = 0.05;
+  double leaf_size = 0.01, distanceThreshold = 0.01, clusterTolerance = 0.05;
 
   pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud_f (new pcl::PointCloud<pcl::PointXYZRGB>);
   
@@ -229,7 +229,7 @@ cloud_cb (const sensor_msgs::PointCloud2ConstPtr& input)
   sor.setLeafSize (leaf_size, leaf_size, leaf_size);
   sor.filter (cloud_filtered_blob);
 
-  voxel_pub.publish(cloud_filtered_blob);
+  
 
   pcl::fromPCLPointCloud2 (cloud_filtered_blob, *cloud_filtered);
 
@@ -266,6 +266,8 @@ cloud_cb (const sensor_msgs::PointCloud2ConstPtr& input)
     extract.filter (*cloud_f);
     *cloud_filtered = *cloud_f;
   }
+
+  voxel_pub.publish(*cloud_filtered);
 
   // Creating the KdTree object for the search method of the extraction
   pcl::search::KdTree<pcl::PointXYZRGB>::Ptr tree (new pcl::search::KdTree<pcl::PointXYZRGB>);
