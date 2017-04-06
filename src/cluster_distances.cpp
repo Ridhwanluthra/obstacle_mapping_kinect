@@ -46,7 +46,7 @@ ros::Publisher pub, arr_pub, voxel_pub;
 
 int j = 0;
 
-int maxDistance = 3;
+int maxDistance = 2;
 
 double get_distance(const pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr& msg, int counter){
 /*
@@ -165,6 +165,26 @@ double get_distance(const pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr& msg, int 
   return minDistance[0];
 }
 
+// void detect_wall(pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud_blob){
+//   BOOST_FOREACH (const pcl::PointXYZRGB& pt, msg->points){//to iterate trough all the points in the filtered point cloud published by publisher
+//     double maxDistance = 0.0;
+//     pcl::PointXYZRGB& maxPoint;
+//     if(hypot(pt.z, pt.x) > maxDistance){
+//       maxDistance = hypot(pt.z, pt.x);
+//       maxPoint = pt;
+//     }
+//   }
+//   BOOST_FOREACH (const pcl::PointXYZRGB& pt, msg->points){//to iterate trough all the points in the filtered point cloud published by publisher
+//     double maxDistance = 0.0;
+//     pcl::PointXYZRGB& maxPoint;
+//     if (hypot(pt.z, pt.x) > maxDistance){
+//       maxDistance = hypot(pt.z, pt.x);
+//       maxPoint = pt;
+//     }
+//   }
+
+// }
+
 
 
 /*
@@ -189,8 +209,8 @@ cloud_cb (const sensor_msgs::PointCloud2ConstPtr& input)
 	// maxClusterSize == Max number of points that are allowed to cluster together.
 	// minClusterSize == Min number of points that should be there to form a cluster
 
-  int minClusterSize = 100, maxClusterSize = 200, maxIterations = 150;
-  double leaf_size = 0.05, distanceThreshold = 0.01, clusterTolerance = 0.05;
+  int minClusterSize = 100, maxClusterSize = 300, maxIterations = 150;
+  double leaf_size = 0.03, distanceThreshold = 0.01, clusterTolerance = 0.05;
 
   pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud_f (new pcl::PointCloud<pcl::PointXYZRGB>);
   

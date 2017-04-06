@@ -180,6 +180,8 @@ double get_distance(const pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr& msg, int 
 * Example Call: Callback function. Manual calling not required 
 *
 */
+
+
 void 
 cloud_cb (const sensor_msgs::PointCloud2ConstPtr& input)
 {
@@ -319,6 +321,8 @@ cloud_cb (const sensor_msgs::PointCloud2ConstPtr& input)
   // image_pub.publish(image);
 
 }
+
+
 
 int
 main (int argc, char** argv)

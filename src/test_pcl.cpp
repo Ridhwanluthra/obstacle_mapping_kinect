@@ -56,7 +56,7 @@ void detect_wall(pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud_blob){
   BOOST_FOREACH (const pcl::PointXYZRGB& pt, cloud_blob->points){//to iterate trough all the points in the filtered point cloud published by publisher
     cout << "x= " << pt.x << " y= " << pt.y << " z= " << pt.z << endl;
     i++;
-    if (i>20)
+    if (i>100)
       break;
   }
 }
@@ -88,8 +88,8 @@ cloud_cb (const sensor_msgs::PointCloud2ConstPtr& input)
 
   voxel_pub.publish(cloud_filtered_blob);
 
-  // pcl::fromPCLPointCloud2 (cloud_filtered_blob, *cloud_filtered);
-  pcl::fromPCLPointCloud2 (*cloud_blob, *cloud_filtered);
+  pcl::fromPCLPointCloud2 (cloud_filtered_blob, *cloud_filtered);
+  // pcl::fromPCLPointCloud2 (*cloud_blob, *cloud_filtered);
   detect_wall(cloud_filtered);
 
   // test_02(pcl::PCLPointCloud2 clo);
