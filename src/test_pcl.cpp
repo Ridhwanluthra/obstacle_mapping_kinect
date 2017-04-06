@@ -65,35 +65,13 @@ void detect_wall(pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud_blob){
 void 
 cloud_cb (const sensor_msgs::PointCloud2ConstPtr& input)
 {
-
-  double leaf_size = 0.03;
-
-  pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud_f (new pcl::PointCloud<pcl::PointXYZRGB>);
-  
-  pcl::PCLPointCloud2* cloud_blob = new pcl::PCLPointCloud2; 
-  pcl::PCLPointCloud2ConstPtr cloudPtr(cloud_blob);
-  pcl::PCLPointCloud2 cloud_filtered_blob;
-
-  pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud_filtered_planar (new pcl::PointCloud<pcl::PointXYZRGB>);
-
+  pcl::PCLPointCloud2* cloud_blob = new pcl::PCLPointCloud2;
+  pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud (new pcl::PointCloud<pcl::PointXYZRGB>);
   pcl_conversions::toPCL(*input, *cloud_blob);
-
-  
-  pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud_filtered (new pcl::PointCloud<pcl::PointXYZRGB>);
-  // Perform the actual filtering
-  pcl::VoxelGrid<pcl::PCLPointCloud2> sor;
-  sor.setInputCloud (cloudPtr);
-  sor.setLeafSize (leaf_size, leaf_size, leaf_size);
-  sor.filter (cloud_filtered_blob);
-
-  voxel_pub.publish(cloud_filtered_blob);
-
-  pcl::fromPCLPointCloud2 (cloud_filtered_blob, *cloud_filtered);
-  // pcl::fromPCLPointCloud2 (*cloud_blob, *cloud_filtered);
-  detect_wall(cloud_filtered);
-
-  // test_02(pcl::PCLPointCloud2 clo);
-
+  pcl::fromPCLPointCloud2 (*cloud_blob, *cloud);
+  std::vector<int> mapping;
+  pcl::removeNaNFromPointCloud(*cloud, *cloud, mapping);
+  detect_wall(cloud);
 }
 
 int
