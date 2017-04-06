@@ -46,6 +46,7 @@
 #include <pcl/sample_consensus/sac_model_normal_plane.h>
 #include <pcl/sample_consensus/sac_model_plane.h>
 
+#include <pcl/features/integral_image_normal.h>
 
 using namespace::std;
 
@@ -54,121 +55,6 @@ ros::Publisher pub, arr_pub, voxel_pub;
 int j = 0;
 
 int maxDistance = 3;
-
-double get_distance(const pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr& msg, int counter){
-/*
-*
-* Function Name:  get_distance
-* Input:    msg -> stores point cloud information to be processed
-            counter -> maintains the frame in consideration, necessary to handle clusters of same frame. 
-* Output:    Publishes the minimum distance to ROS publisher
-* Logic:    Iterates through all points in the filtered point cloud and publishes the min distance,
-*           its angles, its leftmost points distance and angles, its rightmost points distance and angles
-* Example Call:  get_distance (cloud, j)
-*
-*/
-  double rad_to_deg = 57.2958;
-  rad_to_deg = 1;
-
-  const double pi = boost::math::constants::pi<double>();
-
-  double minDistance[4] = {std::numeric_limits<double>::infinity(), std::numeric_limits<double>::infinity(), 0.0};
-// angles of rightmost point in the cluster
-  double min_angle_radx[4] = {std::numeric_limits<double>::infinity(), std::numeric_limits<double>::infinity(), 0.0};
-
-  double min_angle_rady[4] = {std::numeric_limits<double>::infinity(), std::numeric_limits<double>::infinity(), 0.0};
-// angles of leftmost point in the cluster
-  double max_angle_radx[4] = {0.0, -(std::numeric_limits<double>::infinity()), 0.0};
-
-  double max_angle_rady[4] = {0.0, -(std::numeric_limits<double>::infinity()), 0.0};
-  // int i = 0;
-  // Angles are calculated in radians and can convert to degree by multpying it with 180/pi 
-  BOOST_FOREACH (const pcl::PointXYZRGB& pt, msg->points){//to iterate trough all the points in the filtered point cloud published by publisher
-    // std::cout<<i++<<endl;
-    if(hypot(pt.z, pt.x) < minDistance[0]){
-      // keep updating the minimum Distant point
-      minDistance[0] = hypot(pt.z, pt.x);
-      // minDistance[1] = atan2(pt.z,pt.x);
-      minDistance[1] = (atan2(pt.x,pt.z))*rad_to_deg;
-      minDistance[2] = (atan2(pt.y, pt.z))*rad_to_deg;
-    }
-    // Angles are not accurately measured. SO, subtract 0.25 m from each distance.
-    if(((atan2(pt.x, pt.z))*rad_to_deg) < min_angle_radx[1]){
-      // keep updating the minimum angle
-      min_angle_radx[0] = hypot(pt.z, pt.x);
-      min_angle_radx[1] = (atan2(pt.x,pt.z))*rad_to_deg;
-      min_angle_radx[2] = (atan2(pt.y, pt.z))*rad_to_deg;
-    }
-    
-    if(((atan2(pt.x, pt.z))*rad_to_deg) > max_angle_radx[1]){
-      // keep updating the maximum angle
-      max_angle_radx[0] = hypot(pt.z, pt.x);
-      max_angle_radx[1] = (atan2(pt.x,pt.z))*rad_to_deg;
-      max_angle_radx[2] = (atan2(pt.y, pt.z))*rad_to_deg;
-    }
-    if(((atan2(pt.y, pt.z))*rad_to_deg) < min_angle_radx[2]){
-      // keep updating the maximum angle
-      min_angle_rady[0] = hypot(pt.z, pt.x);
-      min_angle_rady[1] = (atan2(pt.x,pt.z))*rad_to_deg;
-      min_angle_rady[2] = (atan2(pt.y, pt.z))*rad_to_deg;
-    }
-    if(((atan2(pt.y, pt.z))*rad_to_deg) > max_angle_radx[2]){
-      // keep updating the maximum angle
-      max_angle_rady[0] = hypot(pt.z, pt.x);
-      max_angle_rady[1] = (atan2(pt.x,pt.z))*rad_to_deg;
-      max_angle_rady[2] = (atan2(pt.y, pt.z))*rad_to_deg;
-    }
-  }
-  if (minDistance[0]<maxDistance)
-  {
-    std::cout<<"-------NEW CLUSTER------"<<std::endl;
-    std::cout<<"MinDistance  "<<minDistance[0]<<"  ";
-    std::cout<<"MinAngleX  "<<minDistance[1]<<"  ";
-    std::cout<<"MinAngleY  "<<minDistance[2]<<std::endl;
-    std::cout<<"LeftDistance  "<<min_angle_radx[0]<<"  ";
-    std::cout<<"LeftAngleX  "<<min_angle_radx[1]<<"  ";
-    std::cout<<"LeftAngleY  "<<min_angle_radx[2]<<std::endl;
-    std::cout<<"RightDistance  "<<max_angle_radx[0]<<"  ";
-    std::cout<<"RightAngleX  "<<max_angle_radx[1]<<"  ";
-    std::cout<<"RightAngleY  "<<max_angle_radx[2]<<std::endl;
-    std_msgs::Float64MultiArray arr;
-
-    arr.data.clear();
-    bool sign1 =  min_angle_radx[1] < 0;
-    bool sign2 =  max_angle_radx[1] < 0;
-    double width = 0.0;
-    if ((sign1 && sign2) || (!sign1 && !sign2))
-    {
-      width = abs(min_angle_radx[0]*sin(abs(min_angle_radx[1])) - max_angle_radx[0]*sin(abs(max_angle_radx[1])));
-    }else{
-      width = abs(min_angle_radx[0]*sin(abs(min_angle_radx[1])) + max_angle_radx[0]*sin(abs(max_angle_radx[1])));
-    }
-    std::cout<<"Width  "<< width <<std::endl;
-
-    sign1 =  min_angle_rady[2] < 0;
-    sign2 =  max_angle_rady[2] < 0;
-    double height = 0.0;
-    if ((sign1 && sign2) || (!sign1 && !sign2))
-    {
-      height = abs(min_angle_rady[0]*sin(abs(min_angle_rady[2])) - max_angle_rady[0]*sin(abs(max_angle_rady[2])));
-    }else{
-      height = abs(min_angle_rady[0]*sin(abs(min_angle_rady[2])) + max_angle_rady[0]*sin(abs(max_angle_rady[2])));
-    }
-    // std::cout<<"Height  "<< height <<std::endl;
-
-    arr.data.push_back(counter);
-    arr.data.push_back(width);
-    // distance of nearest point in cluster
-    arr.data.push_back(minDistance[0]);
-    // angle in xy plane of nearest point in cluster
-    arr.data.push_back(minDistance[1]);
-    arr.data.push_back(height);
-    
-    arr_pub.publish(arr);
-  }
-  return minDistance[0];
-}
-
 
 
 /*
@@ -186,100 +72,168 @@ double get_distance(const pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr& msg, int 
 * Example Call: Callback function. Manual calling not required 
 *
 */
+
+void detect_wall(pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud_blob){
+  cout<< "NEW FRAME " << endl;
+  int i = 0;
+  cout << "WIDTH: " << cloud_blob->width << endl;
+  cout << "HEIGHT: " << cloud_blob->height << endl;
+  BOOST_FOREACH (const pcl::PointXYZRGB& pt, cloud_blob->points){//to iterate trough all the points in the filtered point cloud published by publisher
+    cout << "x= " << pt.x << " y= " << pt.y << " z= " << pt.z << endl;
+    i++;
+    // if (i>100)
+    //   break;
+  }
+}
+
+
 void 
 cloud_cb (const sensor_msgs::PointCloud2ConstPtr& input)
 {
-	// Leaf size == Distance between 2 pts in the point cloud.
-	// maxClusterSize == Max number of points that are allowed to cluster together.
-	// minClusterSize == Min number of points that should be there to form a cluster
+  std::cout<<"hey"<<std::endl;
+  pcl::PCLPointCloud2* cloud_blob = new pcl::PCLPointCloud2;
+  pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud (new pcl::PointCloud<pcl::PointXYZRGB>);
+  pcl_conversions::toPCL(*input, *cloud_blob);
+  pcl::fromPCLPointCloud2 (*cloud_blob, *cloud);
+  std::vector<int> mapping;
+  pcl::removeNaNFromPointCloud(*cloud, *cloud, mapping);
+  detect_wall(cloud);
+  // pub.publish(*input);
+  // ROS_INFO_STREAM("HEY");
 
-  int minClusterSize = 100, maxClusterSize = 200, maxIterations = 150;
-  double leaf_size = 0.05, distanceThreshold = 0.01, clusterTolerance = 0.05;
+  // pcl::PCLPointCloud2* cloud_blob = new pcl::PCLPointCloud2;
+  // pcl::PCLPointCloud2ConstPtr cloudPtr(cloud_blob);
+  // pcl::PCLPointCloud2 cloud_filtered_blob;
 
-  pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud_f (new pcl::PointCloud<pcl::PointXYZRGB>);
+  // pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud_filtered_planar (new pcl::PointCloud<pcl::PointXYZRGB>);
+
+  // pcl_conversions::toPCL(*input, *cloud_blob);
   
-  pcl::PCLPointCloud2* cloud_blob = new pcl::PCLPointCloud2; 
-  pcl::PCLPointCloud2ConstPtr cloudPtr(cloud_blob);
-  pcl::PCLPointCloud2 cloud_filtered_blob;
+  // pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud_filtered (new pcl::PointCloud<pcl::PointXYZRGB>);
+  // // Perform the actual filtering
+  // pcl::VoxelGrid<pcl::PCLPointCloud2> sor;
+  // sor.setInputCloud (cloudPtr);
+  // float leaf_size = 0.1;
+  // sor.setLeafSize (leaf_size, leaf_size, leaf_size);
+  // sor.filter (cloud_filtered_blob);
 
-  pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud_filtered_planar (new pcl::PointCloud<pcl::PointXYZRGB>);
+  // voxel_pub.publish(cloud_filtered_blob);
 
-  pcl_conversions::toPCL(*input, *cloud_blob);  
+
+
+  // estimate normals
+  // pcl::PointCloud<pcl::Normal>::Ptr normals (new pcl::PointCloud<pcl::Normal>);
+
+  // pcl::IntegralImageNormalEstimation<pcl::PointXYZ, pcl::Normal> ne;
+  // ne.setNormalEstimationMethod (ne.AVERAGE_3D_GRADIENT);
+  // ne.setMaxDepthChangeFactor(0.02f);
+  // ne.setNormalSmoothingSize(10.0f);
+  // ne.setInputCloud(cloud);
+  // ne.compute(*normals);
+  // std::cout<<"hey"<<std::endl;
+
+  // visualize normals
+  // pcl::visualization::PCLVisualizer viewer("PCL Viewer");
+  // viewer.setBackgroundColor (0.0, 0.0, 0.5);
+  // viewer.addPointCloudNormals<pcl::PointXYZ,pcl::Normal>(cloud, normals);
+
+  // while (!viewer.wasStopped ())
+  // {
+  //  viewer.spinOnce ();
+  // }
+
+
+	// // Leaf size == Distance between 2 pts in the point cloud.
+	// // maxClusterSize == Max number of points that are allowed to cluster together.
+	// // minClusterSize == Min number of points that should be there to form a cluster
+
+ //  int minClusterSize = 100, maxClusterSize = 200, maxIterations = 150;
+ //  double leaf_size = 0.05, distanceThreshold = 0.01, clusterTolerance = 0.05;
+
+ //  pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud_f (new pcl::PointCloud<pcl::PointXYZRGB>);
   
-  pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud_filtered (new pcl::PointCloud<pcl::PointXYZRGB>);
-  // Perform the actual filtering
-  pcl::VoxelGrid<pcl::PCLPointCloud2> sor;
-  sor.setInputCloud (cloudPtr);
-  sor.setLeafSize (leaf_size, leaf_size, leaf_size);
-  sor.filter (cloud_filtered_blob);
+ //  pcl::PCLPointCloud2* cloud_blob = new pcl::PCLPointCloud2; 
+ //  pcl::PCLPointCloud2ConstPtr cloudPtr(cloud_blob);
+ //  pcl::PCLPointCloud2 cloud_filtered_blob;
 
-  voxel_pub.publish(cloud_filtered_blob);
+ //  pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud_filtered_planar (new pcl::PointCloud<pcl::PointXYZRGB>);
 
-  pcl::fromPCLPointCloud2 (cloud_filtered_blob, *cloud_filtered);
+ //  pcl_conversions::toPCL(*input, *cloud_blob);  
+  
+ //  pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud_filtered (new pcl::PointCloud<pcl::PointXYZRGB>);
+ //  // Perform the actual filtering
+ //  pcl::VoxelGrid<pcl::PCLPointCloud2> sor;
+ //  sor.setInputCloud (cloudPtr);
+ //  sor.setLeafSize (leaf_size, leaf_size, leaf_size);
+ //  sor.filter (cloud_filtered_blob);
 
-  // Create the segmentation object for the planar model and set all the parameters
-  pcl::SACSegmentation<pcl::PointXYZRGB> seg;
-  pcl::PointIndices::Ptr inliers (new pcl::PointIndices);
-  pcl::ModelCoefficients::Ptr coefficients (new pcl::ModelCoefficients);
-  pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud_plane (new pcl::PointCloud<pcl::PointXYZRGB> ());
-  pcl::PCDWriter writer;
-  seg.setOptimizeCoefficients (true);
-  seg.setModelType (pcl::SACMODEL_PLANE);
-  seg.setMethodType (pcl::SAC_RANSAC);
-  seg.setMaxIterations (maxIterations);
-  seg.setDistanceThreshold (distanceThreshold);
+ //  voxel_pub.publish(cloud_filtered_blob);
 
-  int i=0, nr_points = (int) cloud_filtered->points.size ();
-  while (cloud_filtered->points.size () > 0.3 * nr_points)
-  {
-    // Segment the largest planar component from the remaining cloud
-    seg.setInputCloud (cloud_filtered);
-    seg.segment (*inliers, *coefficients);
-    if (inliers->indices.size () == 0)
-    {
-      std::cout << "Could not estimate a planar model for the given dataset." << std::endl;
-      break;
-    }
+ //  pcl::fromPCLPointCloud2 (cloud_filtered_blob, *cloud_filtered);
 
-    // Extract the planar inliers from the input cloud
-    pcl::ExtractIndices<pcl::PointXYZRGB> extract;
-    extract.setInputCloud (cloud_filtered);
-    extract.setIndices (inliers);
-    // Remove the planar inliers, extract the rest
-    extract.setNegative (true);
-    extract.filter (*cloud_f);
-    *cloud_filtered = *cloud_f;
-  }
+ //  // Create the segmentation object for the planar model and set all the parameters
+ //  pcl::SACSegmentation<pcl::PointXYZRGB> seg;
+ //  pcl::PointIndices::Ptr inliers (new pcl::PointIndices);
+ //  pcl::ModelCoefficients::Ptr coefficients (new pcl::ModelCoefficients);
+ //  pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud_plane (new pcl::PointCloud<pcl::PointXYZRGB> ());
+ //  pcl::PCDWriter writer;
+ //  seg.setOptimizeCoefficients (true);
+ //  seg.setModelType (pcl::SACMODEL_PLANE);
+ //  seg.setMethodType (pcl::SAC_RANSAC);
+ //  seg.setMaxIterations (maxIterations);
+ //  seg.setDistanceThreshold (distanceThreshold);
 
-  // pcl::SampleConsensusModelNormalPlane<pcl::PointXYZRGB, pcl::Normal> sac_model;
+ //  int i=0, nr_points = (int) cloud_filtered->points.size ();
+ //  while (cloud_filtered->points.size () > 0.3 * nr_points)
+ //  {
+ //    // Segment the largest planar component from the remaining cloud
+ //    seg.setInputCloud (cloud_filtered);
+ //    seg.segment (*inliers, *coefficients);
+ //    if (inliers->indices.size () == 0)
+ //    {
+ //      std::cout << "Could not estimate a planar model for the given dataset." << std::endl;
+ //      break;
+ //    }
 
-  pcl::PointCloud<pcl::Normal>::Ptr normals_out (new pcl::PointCloud<pcl::Normal>);
-  pcl::IntegralImageNormalEstimation<pcl::PointXYZRGB, pcl::Normal> norm_est;
-  // Specify method for normal estimation
-  norm_est.setNormalEstimationMethod (ne.AVERAGE_3D_GRADIENT);
-  // Specify max depth change factor
-  norm_est.setMaxDepthChangeFactor(0.02f);
-  // Specify smoothing area size
-  norm_est.setNormalSmoothingSize(10.0f);
-  // Set the input points
-  norm_est.setInputCloud (points);
-  // Estimate the surface normals and
-  // store the result in "normals_out"
-  norm_est.compute (*normals_out);
+ //    // Extract the planar inliers from the input cloud
+ //    pcl::ExtractIndices<pcl::PointXYZRGB> extract;
+ //    extract.setInputCloud (cloud_filtered);
+ //    extract.setIndices (inliers);
+ //    // Remove the planar inliers, extract the rest
+ //    extract.setNegative (true);
+ //    extract.filter (*cloud_f);
+ //    *cloud_filtered = *cloud_f;
+ //  }
 
-  // Create a shared plane model pointer directly
-  pcl::SampleConsensusModelNormalPlane<PointXYZRGB, pcl::Normal>::Ptr model (new SampleConsensusModelNormalPlane<PointXYZ, pcl::Normal> (*cloud_filtered));
-  // Set normals
-  model->setInputNormals(normals);
-  // Set the normal angular distance weight.
-  model->setNormalDistanceWeight(0.5f);
-  // Create the RANSAC object
-  RandomSampleConsensus<PointXYZRGB> sac (model, 0.03);
-  // perform the segmenation step
-  bool result = sac.computeModel ();
+ //  // pcl::SampleConsensusModelNormalPlane<pcl::PointXYZRGB, pcl::Normal> sac_model;
+
+ //  pcl::PointCloud<pcl::Normal>::Ptr normals_out (new pcl::PointCloud<pcl::Normal>);
+ //  pcl::IntegralImageNormalEstimation<pcl::PointXYZRGB, pcl::Normal> norm_est;
+ //  // Specify method for normal estimation
+ //  norm_est.setNormalEstimationMethod (ne.AVERAGE_3D_GRADIENT);
+ //  // Specify max depth change factor
+ //  norm_est.setMaxDepthChangeFactor(0.02f);
+ //  // Specify smoothing area size
+ //  norm_est.setNormalSmoothingSize(10.0f);
+ //  // Set the input points
+ //  norm_est.setInputCloud (points);
+ //  // Estimate the surface normals and
+ //  // store the result in "normals_out"
+ //  norm_est.compute (*normals_out);
+
+ //  // Create a shared plane model pointer directly
+ //  pcl::SampleConsensusModelNormalPlane<PointXYZRGB, pcl::Normal>::Ptr model (new SampleConsensusModelNormalPlane<PointXYZ, pcl::Normal> (*cloud_filtered));
+ //  // Set normals
+ //  model->setInputNormals(normals);
+ //  // Set the normal angular distance weight.
+ //  model->setNormalDistanceWeight(0.5f);
+ //  // Create the RANSAC object
+ //  RandomSampleConsensus<PointXYZRGB> sac (model, 0.03);
+ //  // perform the segmenation step
+ //  bool result = sac.computeModel ();
 
 
-  // pub.publish (cloud_final);
+ //  // pub.publish (cloud_final);
 }
 
 int
