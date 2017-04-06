@@ -9,10 +9,10 @@
 * global variables: curr_frame, data_per_frame, check
 *
 '''
-import gpio_control as gc
+##import gpio_control as gc
 import rospy
 from std_msgs.msg import String, Float64MultiArray, MultiArrayLayout, MultiArrayDimension
-import requests
+##import requests
 import math
 from time import sleep
 
@@ -58,28 +58,32 @@ def callback(data):
                 width.append(round(dat[1], 2))
                 minDistance.append(round(dat[2], 2))
                 min_angle.append(round(dat[3], 2))
+                print ("MINANGLE")
+                print (round(dat[3], 2))
                 left_most.append(round(dat[4], 2))
                 right_most.append(round(dat[5], 2))
-                
                 direction.append("right" if min_angle[-1] > 0 else "left")
             for i in range(len(width)):
+                print (i)
+                print (abs(min_angle[i] * (180 / math.pi)))
+                print (min_angle[i])
                 if width > 0.0:
                     if abs(min_angle[i] * (180 / math.pi)) < 20:
                         print('center')
-                        gc.switch_on(center_pin)
-                        gc.switch_off(right_pin)
-                        gc.switch_off(left_pin)
+##                        gc.switch_on(center_pin)
+##                        gc.switch_off(right_pin)
+##                        gc.switch_off(left_pin)
                     else:
                         if direction[i] == "right":
                             print('right')
-                            gc.switch_on(right_pin)
-                            gc.switch_off(center_pin)
-                            gc.switch_off(left_pin)
+##                            gc.switch_on(right_pin)
+##                            gc.switch_off(center_pin)
+##                            gc.switch_off(left_pin)
                         else:
                             print('left')
-                            gc.switch_on(left_pin)
-                            gc.switch_off(right_pin)
-                            gc.switch_off(center_pin)
+##                            gc.switch_on(left_pin)
+##                            gc.switch_off(right_pin)
+##                            gc.switch_off(center_pin)
             width = list()
             min_angle = list()
             minDistance = list()
@@ -90,7 +94,7 @@ def callback(data):
             data_per_frame = list()
     except Exception as e:
         print(e)
-        gc.reset()
+##        gc.reset()
 
 '''
 *
