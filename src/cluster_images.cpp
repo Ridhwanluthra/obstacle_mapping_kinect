@@ -9,6 +9,7 @@
 */
 #include <ros/ros.h>
 #include <sensor_msgs/PointCloud2.h>
+#include <sensor_msgs/Image.h>
 
 #include <pcl_conversions/pcl_conversions.h>
 #include <pcl/point_cloud.h>
@@ -42,11 +43,11 @@
 
 using namespace::std;
 
-ros::Publisher pub, arr_pub, voxel_pub;
+ros::Publisher pub, arr_pub, voxel_pub, image_pub;
 
 int j = 0;
 
-int maxDistance = 2;
+int maxDistance = 3;
 
 double get_distance(const pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr& msg, int counter){
 /*
@@ -68,11 +69,11 @@ double get_distance(const pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr& msg, int 
   double minDistance[4] = {std::numeric_limits<double>::infinity(), std::numeric_limits<double>::infinity(), 0.0};
 // angles of rightmost point in the cluster
   double min_angle_radx[4] = {std::numeric_limits<double>::infinity(), std::numeric_limits<double>::infinity(), 0.0};
-// angles of bottommost point in the cluster
+
   double min_angle_rady[4] = {std::numeric_limits<double>::infinity(), std::numeric_limits<double>::infinity(), 0.0};
 // angles of leftmost point in the cluster
   double max_angle_radx[4] = {0.0, -(std::numeric_limits<double>::infinity()), 0.0};
-// angles of topmost point in the cluster
+
   double max_angle_rady[4] = {0.0, -(std::numeric_limits<double>::infinity()), 0.0};
   // int i = 0;
   // Angles are calculated in radians and can convert to degree by multpying it with 180/pi 
@@ -155,35 +156,12 @@ double get_distance(const pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr& msg, int 
     arr.data.push_back(minDistance[0]);
     // angle in xy plane of nearest point in cluster
     arr.data.push_back(minDistance[1]);
-    // arr.data.push_back(height);
-    arr.data.push_back(minDistance[1]);
-    arr.data.push_back(min_angle_radx[1]);
-    arr.data.push_back(max_angle_radx[1]);
+    arr.data.push_back(height);
     
     arr_pub.publish(arr);
   }
   return minDistance[0];
 }
-
-// void detect_wall(pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud_blob){
-//   BOOST_FOREACH (const pcl::PointXYZRGB& pt, msg->points){//to iterate trough all the points in the filtered point cloud published by publisher
-//     double maxDistance = 0.0;
-//     pcl::PointXYZRGB& maxPoint;
-//     if(hypot(pt.z, pt.x) > maxDistance){
-//       maxDistance = hypot(pt.z, pt.x);
-//       maxPoint = pt;
-//     }
-//   }
-//   BOOST_FOREACH (const pcl::PointXYZRGB& pt, msg->points){//to iterate trough all the points in the filtered point cloud published by publisher
-//     double maxDistance = 0.0;
-//     pcl::PointXYZRGB& maxPoint;
-//     if (hypot(pt.z, pt.x) > maxDistance){
-//       maxDistance = hypot(pt.z, pt.x);
-//       maxPoint = pt;
-//     }
-//   }
-
-// }
 
 
 
@@ -202,6 +180,8 @@ double get_distance(const pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr& msg, int 
 * Example Call: Callback function. Manual calling not required 
 *
 */
+
+
 void 
 cloud_cb (const sensor_msgs::PointCloud2ConstPtr& input)
 {
@@ -209,12 +189,12 @@ cloud_cb (const sensor_msgs::PointCloud2ConstPtr& input)
 	// maxClusterSize == Max number of points that are allowed to cluster together.
 	// minClusterSize == Min number of points that should be there to form a cluster
 
-  int minClusterSize = 100, maxClusterSize = 300, maxIterations = 150;
-  double leaf_size = 0.03, distanceThreshold = 0.01, clusterTolerance = 0.05;
+  int minClusterSize = 1000, maxClusterSize = 25000, maxIterations = 100;
+  double leaf_size = 0.01, distanceThreshold = 0.01, clusterTolerance = 0.05;
 
   pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud_f (new pcl::PointCloud<pcl::PointXYZRGB>);
   
-  pcl::PCLPointCloud2* cloud_blob = new pcl::PCLPointCloud2; 
+  pcl::PCLPointCloud2* cloud_blob = new pcl::PCLPointCloud2;
   pcl::PCLPointCloud2ConstPtr cloudPtr(cloud_blob);
   pcl::PCLPointCloud2 cloud_filtered_blob;
 
@@ -286,6 +266,9 @@ cloud_cb (const sensor_msgs::PointCloud2ConstPtr& input)
   *cloud_clust_remove = *cloud_filtered;
   pcl::PointCloud<pcl::PointXYZRGB> cloud_xyzrgb;
   double range;
+
+  pcl::fromPCLPointCloud2(*cloud_blob, *cloud_clust_remove);
+  
   std::cout<<"-------NEW FRAME------"<<std::endl<<std::endl;
   for (int it = 0; it < cluster_indices.size(); ++it)
   {
@@ -305,24 +288,41 @@ cloud_cb (const sensor_msgs::PointCloud2ConstPtr& input)
     cloud_xyzrgb = *cloud_f;
 
     // iteratively colors the cluster red, green or blue.
-    for (size_t i = 0; i < cloud_xyzrgb.points.size(); i++) {
-      if (it % 3 == 0) {
-        cloud_xyzrgb.points[i].r = 255;
-      }
-      else if (it % 3 == 1) {
-        cloud_xyzrgb.points[i].g = 255;
-      }
-      else if (it % 3 == 2) {
-        cloud_xyzrgb.points[i].b = 255;  
-      }
-    }
+    // for (size_t i = 0; i < cloud_xyzrgb.points.size(); i++) {
+    //   if (it % 3 == 0) {
+    //     cloud_xyzrgb.points[i].r = 255;
+    //   }
+    //   else if (it % 3 == 1) {
+    //     cloud_xyzrgb.points[i].g = 255;
+    //   }
+    //   else if (it % 3 == 2) {
+    //     cloud_xyzrgb.points[i].b = 255;  
+    //   }
+    // }
 
     pcl::toPCLPointCloud2 (cloud_xyzrgb, temp);
     pcl::concatenatePointCloud(cloud_final, temp, cloud_final);
   }
   j++;
-  pub.publish (cloud_final);
+  // pub.publish (cloud_final);
+  std::cout<<"outside now"<<std::endl;
+
+  sensor_msgs::PointCloud2* pt_cloud = new sensor_msgs::PointCloud2;
+
+  pcl::PCLPointCloud2* pt_cl(&cloud_final);
+
+  pcl_conversions::fromPCL(*pt_cl, *pt_cloud);
+  pub.publish(*pt_cloud);
+
+  sensor_msgs::Image image;
+
+  // pcl::toROSMsg (*pt_cloud, image);
+  
+  // image_pub.publish(image);
+
 }
+
+
 
 int
 main (int argc, char** argv)
@@ -342,7 +342,8 @@ main (int argc, char** argv)
 
   // publishing  details
   arr_pub = nh.advertise<std_msgs::Float64MultiArray> ("cluster_distances", 10);
-  // pub = 
+  
+  image_pub = nh.advertise<sensor_msgs::Image> ("image_out", 30);
 
   // Spin
   ros::spin ();

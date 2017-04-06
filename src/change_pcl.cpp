@@ -147,43 +147,55 @@ double get_distance(const pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr& msg, int 
     }else{
       height = abs(min_angle_rady[0]*sin(abs(min_angle_rady[2])) + max_angle_rady[0]*sin(abs(max_angle_rady[2])));
     }
-    // std::cout<<"Height  "<< height <<std::endl;
-
-    arr.data.push_back(counter);
-    arr.data.push_back(width);
-    // distance of nearest point in cluster
-    arr.data.push_back(minDistance[0]);
-    // angle in xy plane of nearest point in cluster
-    arr.data.push_back(minDistance[1]);
-    // arr.data.push_back(height);
-    arr.data.push_back(minDistance[1]);
-    arr.data.push_back(min_angle_radx[1]);
-    arr.data.push_back(max_angle_radx[1]);
-    
-    arr_pub.publish(arr);
   }
   return minDistance[0];
 }
 
-// void detect_wall(pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud_blob){
-//   BOOST_FOREACH (const pcl::PointXYZRGB& pt, msg->points){//to iterate trough all the points in the filtered point cloud published by publisher
-//     double maxDistance = 0.0;
-//     pcl::PointXYZRGB& maxPoint;
-//     if(hypot(pt.z, pt.x) > maxDistance){
-//       maxDistance = hypot(pt.z, pt.x);
-//       maxPoint = pt;
-//     }
-//   }
-//   BOOST_FOREACH (const pcl::PointXYZRGB& pt, msg->points){//to iterate trough all the points in the filtered point cloud published by publisher
-//     double maxDistance = 0.0;
-//     pcl::PointXYZRGB& maxPoint;
-//     if (hypot(pt.z, pt.x) > maxDistance){
-//       maxDistance = hypot(pt.z, pt.x);
-//       maxPoint = pt;
-//     }
-//   }
+void getOriginalPointCloud(pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud_blob, std::vector<pcl::PointIndices> cluster){
+  for (int it = 0; it < cluster_indices.size(); ++it)
+  {
+    pcl::ExtractIndices<pcl::PointXYZRGB> ext;
+    ext.setInputCloud (cloud_clust_remove);
+    ext.setIndices(boost::shared_ptr<pcl::PointIndices> (new pcl::PointIndices(cluster_indices[it])));
+    // to extract just the cluster
+    ext.setNegative (false);
+    ext.filter (*cloud_f);
+    range = get_distance(cloud_f, j);
+    // to ignore far away clusters for brevity.
+    if (range >= maxDistance){
+      continue;
+    }
+    cloud_xyzrgb = *cloud_f;
 
-// }
+    // iteratively colors the cluster red, green or blue.
+    for (size_t i = 0; i < cloud_xyzrgb.points.size(); i++) {
+      if (it % 3 == 0) {
+        cloud_xyzrgb.points[i].r = 255;
+      }
+      else if (it % 3 == 1) {
+        cloud_xyzrgb.points[i].g = 255;
+      }
+      else if (it % 3 == 2) {
+        cloud_xyzrgb.points[i].b = 255;  
+      }
+    }
+  BOOST_FOREACH (const pcl::PointXYZRGB& pt, cloud_blob->points){//to iterate trough all the points in the filtered point cloud published by publisher
+    double maxDistance = 0.0;
+    pcl::PointXYZRGB& maxPoint;
+    if(hypot(pt.z, pt.x) > maxDistance){
+      maxDistance = hypot(pt.z, pt.x);
+      maxPoint = pt;
+    }
+  }
+  BOOST_FOREACH (const pcl::PointXYZRGB& pt, cloud_blob->points){//to iterate trough all the points in the filtered point cloud published by publisher
+    pcl::PointXYZRGB& maxPoint;
+    if (hypot(pt.z, pt.x) > maxDistance){
+      maxDistance = hypot(pt.z, pt.x);
+      maxPoint = pt;
+    }
+  }
+
+}
 
 
 
@@ -205,9 +217,9 @@ double get_distance(const pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr& msg, int 
 void 
 cloud_cb (const sensor_msgs::PointCloud2ConstPtr& input)
 {
-	// Leaf size == Distance between 2 pts in the point cloud.
-	// maxClusterSize == Max number of points that are allowed to cluster together.
-	// minClusterSize == Min number of points that should be there to form a cluster
+  // Leaf size == Distance between 2 pts in the point cloud.
+  // maxClusterSize == Max number of points that are allowed to cluster together.
+  // minClusterSize == Min number of points that should be there to form a cluster
 
   int minClusterSize = 100, maxClusterSize = 300, maxIterations = 150;
   double leaf_size = 0.03, distanceThreshold = 0.01, clusterTolerance = 0.05;
@@ -287,6 +299,7 @@ cloud_cb (const sensor_msgs::PointCloud2ConstPtr& input)
   pcl::PointCloud<pcl::PointXYZRGB> cloud_xyzrgb;
   double range;
   std::cout<<"-------NEW FRAME------"<<std::endl<<std::endl;
+
   for (int it = 0; it < cluster_indices.size(); ++it)
   {
 
