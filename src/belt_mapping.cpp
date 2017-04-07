@@ -61,8 +61,6 @@ void get_distance(const pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr& msg){
 
   float center_threshold = 0.26;
 
-  const double pi = boost::math::constants::pi<double>();
-
   double distances[3] = {std::numeric_limits<double>::infinity(), std::numeric_limits<double>::infinity(), std::numeric_limits<double>::infinity()};
   // int i = 0;
   // Angles are calculated in radians and can convert to degree by multpying it with 180/pi 

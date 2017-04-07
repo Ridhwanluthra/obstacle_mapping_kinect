@@ -9,15 +9,15 @@
 * global variables: curr_frame, data_per_frame, check
 *
 '''
-##import gpio_control as gc
+import gpio_control as gc
 import rospy
 from std_msgs.msg import String, Float64MultiArray, MultiArrayLayout, MultiArrayDimension
 import requests
 import math
 
 right_pin = 8
-left_pin = 7
-center_pin = 6
+left_pin = 6
+center_pin = 7
 
 pins = [left_pin, center_pin, right_pin]
 directions = ['left', 'center', 'right']
@@ -41,10 +41,10 @@ def callback(data):
         for i in range(3):
             if data.data[i] < 1:
                 print(directions[i])
-                # gc.switch_on(pins[i])
+                gc.switch_on(pins[i])
             else:
                 pass
-                # gc.switch_off(pins[i])
+                gc.switch_off(pins[i])
             sentence += directions[i] + ": " +str(round(data.data[i], 2)) + ", "
         sentence = sentence[:-2]
         print(sentence)
@@ -57,7 +57,7 @@ def callback(data):
 
     except Exception as e:
         print(e)
-        # gc.reset()
+        gc.reset()
 
 '''
 *
