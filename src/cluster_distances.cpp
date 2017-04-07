@@ -46,7 +46,7 @@ ros::Publisher pub, arr_pub, voxel_pub;
 
 int j = 0;
 
-int maxDistance = 2;
+int maxDistance = 3;
 
 double get_distance(const pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr& msg, int counter){
 /*
@@ -157,8 +157,8 @@ double get_distance(const pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr& msg, int 
     arr.data.push_back(minDistance[1]);
     // arr.data.push_back(height);
     arr.data.push_back(minDistance[1]);
-    arr.data.push_back(min_angle_radx[1]);
     arr.data.push_back(max_angle_radx[1]);
+    arr.data.push_back(min_angle_radx[1]);
     
     arr_pub.publish(arr);
   }
@@ -209,7 +209,7 @@ cloud_cb (const sensor_msgs::PointCloud2ConstPtr& input)
 	// maxClusterSize == Max number of points that are allowed to cluster together.
 	// minClusterSize == Min number of points that should be there to form a cluster
 
-  int minClusterSize = 100, maxClusterSize = 300, maxIterations = 150;
+  int minClusterSize = 120, maxClusterSize = 250, maxIterations = 150;
   double leaf_size = 0.03, distanceThreshold = 0.01, clusterTolerance = 0.05;
 
   pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud_f (new pcl::PointCloud<pcl::PointXYZRGB>);
