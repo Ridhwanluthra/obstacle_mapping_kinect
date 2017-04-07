@@ -38,6 +38,7 @@ val = int()
 '''
 def callback(data):
     global sentence, val
+<<<<<<< Updated upstream
     try:
         for i in range(3):
             if data.data[i] is inf:
@@ -48,6 +49,20 @@ def callback(data):
             else:
                 gc.switch_off(pins[i])
             sentence += directions[i] + ": " +str(round(data.data[i], 2)) + ", "
+=======
+    dat = list(data.data)
+    try:
+        for i in range(3):
+            if dat[i] > 100:
+                dat[i] = 0
+            if dat[i] < 1:
+                print(directions[i])
+                gc.switch_on(pins[i])
+            else:
+                pass
+                gc.switch_off(pins[i])
+            sentence += directions[i] + ": " +str(round(dat[i], 2)) + ", "
+>>>>>>> Stashed changes
         sentence = sentence[:-2]
         print(sentence)
 
