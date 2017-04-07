@@ -116,14 +116,14 @@ double get_distance(const pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr& msg, int 
   {
     std::cout<<"-------NEW CLUSTER------"<<std::endl;
     std::cout<<"MinDistance  "<<minDistance[0]<<"  ";
-    std::cout<<"MinAngleX  "<<minDistance[1]<<"  ";
-    std::cout<<"MinAngleY  "<<minDistance[2]<<std::endl;
+    std::cout<<"MinDistanceAngle  "<<minDistance[1]<<"  ";
+    // std::cout<<"LEFTMOST  "<<minDistance[2]<<std::endl;
     std::cout<<"LeftDistance  "<<min_angle_radx[0]<<"  ";
-    std::cout<<"LeftAngleX  "<<min_angle_radx[1]<<"  ";
-    std::cout<<"LeftAngleY  "<<min_angle_radx[2]<<std::endl;
+    std::cout<<"LeftAngle  "<<min_angle_radx[1]<<"  ";
+    std::cout<<"TopAngle  "<< min_angle_rady[2]<< std::endl;
     std::cout<<"RightDistance  "<<max_angle_radx[0]<<"  ";
-    std::cout<<"RightAngleX  "<<max_angle_radx[1]<<"  ";
-    std::cout<<"RightAngleY  "<<max_angle_radx[2]<<std::endl;
+    std::cout<<"BottomAngle  "<< max_angle_rady[2]<<"  " << std::endl;
+    // std::cout<<"RightAngleY  "<<max_angle_radx[2]<<std::endl;
     std_msgs::Float64MultiArray arr;
 
     arr.data.clear();
@@ -147,7 +147,7 @@ double get_distance(const pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr& msg, int 
     }else{
       height = abs(min_angle_rady[0]*sin(abs(min_angle_rady[2])) + max_angle_rady[0]*sin(abs(max_angle_rady[2])));
     }
-    // std::cout<<"Height  "<< height <<std::endl;
+    std::cout<<"Height  "<< height <<std::endl;
 
     arr.data.push_back(counter);
     arr.data.push_back(width);
@@ -305,17 +305,34 @@ cloud_cb (const sensor_msgs::PointCloud2ConstPtr& input)
     cloud_xyzrgb = *cloud_f;
 
     // iteratively colors the cluster red, green or blue.
+    int i = 0;
     for (size_t i = 0; i < cloud_xyzrgb.points.size(); i++) {
       if (it % 3 == 0) {
         cloud_xyzrgb.points[i].r = 255;
+        if (i==0)
+        {
+          cout << "r";
+          i++;
+        }
       }
       else if (it % 3 == 1) {
         cloud_xyzrgb.points[i].g = 255;
+        if (i==0)
+        {
+          cout << "g";
+          i++;
+        }
       }
       else if (it % 3 == 2) {
         cloud_xyzrgb.points[i].b = 255;  
+        if (i==0)
+        {
+          cout << "b";
+          i++;
+        }
       }
     }
+    // cout << (int)cloud_xyzrgb.points[1].r << " " << (int)cloud_xyzrgb.points[2].g << " " << (char)cloud_xyzrgb.points[3].b << endl;
 
     pcl::toPCLPointCloud2 (cloud_xyzrgb, temp);
     pcl::concatenatePointCloud(cloud_final, temp, cloud_final);

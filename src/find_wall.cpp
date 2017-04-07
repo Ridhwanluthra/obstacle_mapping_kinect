@@ -72,7 +72,6 @@ void detect_wall(std::vector<pcl::PointIndices> cluster_indices, pcl::PointCloud
   pcl::PointXYZRGB& pt_clusters[cluster_indices.size()];
   for (int it = 0; it < cluster_indices.size(); ++it)
   {
-
     // Extract the planar inliers from the input cloud
     pcl::ExtractIndices<pcl::PointXYZRGB> ext;
     ext.setInputCloud (cloud_clust_remove);
@@ -87,10 +86,39 @@ void detect_wall(std::vector<pcl::PointIndices> cluster_indices, pcl::PointCloud
     }
     pcl::PointCloud<pcl::PointXYZRGB> cloud_xyzrgb = *cloud_f;
     pt_clusters[it] = cloud_xyzrgb.points[0];
-  }
-  BOOST_FOREACH (const pcl::PointXYZRGB& pt, cloud_blob->points){
+    for (size_t i = 0; i < cloud_xyzrgb.points.size(); i++) {
+      if (it % 3 == 0) {
+        cloud_xyzrgb.points[i].r = 255;
+      }
+      else if (it % 3 == 1) {
+        cloud_xyzrgb.points[i].g = 255;
+      }
+      else if (it % 3 == 2) {
+        cloud_xyzrgb.points[i].b = 255;  
+      }
+    }
 
   }
+
+  BOOST_FOREACH (const pcl::PointXYZRGB& pt, cloud_blob->points){
+    // Check if point is leftmost
+    if(((atan2(pt.x, pt.z))*rad_to_deg) < leftmost_angle[it]){
+      leftmost_angle[it] = (atan2(pt.x,pt.z))*rad_to_deg;
+    }
+    // Check if point is rightmost
+    if(((atan2(pt.x, pt.z))*rad_to_deg) > rightmost_point[it]){
+      rightmost_point[it] = (atan2(pt.x,pt.z))*rad_to_deg;
+    }
+    // Check if point is topmost
+    if(((atan2(pt.y, pt.z))*rad_to_deg) < topmost_point[it]){
+      topmost_point[it] = (atan2(pt.y, pt.z))*rad_to_deg;
+    }
+    // Check if point is bottommost
+    if(((atan2(pt.y, pt.z))*rad_to_deg) > bottommost_point){
+      bottommost_point[it] = (atan2(pt.y, pt.z))*rad_to_deg;
+    }
+  }
+
 }
 
 

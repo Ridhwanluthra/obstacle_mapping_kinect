@@ -1,5 +1,5 @@
 <launch>
-	<include file="$(find openni_launch)/launch/openni.launch" />
+	<include file="$(find freenect_launch)/launch/freenect.launch" />
 	<node
 		name="cluster_dist"
 		pkg="obstacle_mapping"
