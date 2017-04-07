@@ -156,7 +156,6 @@ double get_distance(const pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr& msg, int 
     // angle in xy plane of nearest point in cluster
     arr.data.push_back(minDistance[1]);
     // arr.data.push_back(height);
-    arr.data.push_back(minDistance[1]);
     arr.data.push_back(min_angle_radx[1]);
     arr.data.push_back(max_angle_radx[1]);
     

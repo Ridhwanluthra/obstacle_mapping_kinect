@@ -68,23 +68,24 @@ void get_distance(const pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr& msg){
   // Angles are calculated in radians and can convert to degree by multpying it with 180/pi 
   //to iterate trough all the points in the filtered point cloud published by publisher
   BOOST_FOREACH (const pcl::PointXYZRGB& pt, msg->points){
-    cout<<atan2(pt.x,pt.z)<<endl;
+    double angle = atan2(pt.x, pt.z);
+    cout<<angle<<endl;
     // std::cout<<i++<<endl;
-    if(atan2(pt.x,pt.z) < -center_threshold){
+    if(angle < -center_threshold){
       // keep updating the minimum Distant point
       if (hypot(pt.z, pt.x) < distances[0]) {
         distances[0] = hypot(pt.z, pt.x);
       }
     }
     // Angles are not accurately measured. SO, subtract 0.25 m from each distance.
-    if(-center_threshold < atan2(pt.x, pt.z) < center_threshold){
+    if(angle > -center_threshold && angle < center_threshold){
       // keep updating the minimum angle
       if (hypot(pt.z, pt.x) < distances[1]) {
         distances[1] = hypot(pt.z, pt.x);
       }
     }
     
-    if(atan2(pt.x,pt.z) > center_threshold){
+    if(angle > center_threshold){
       // keep updating the maximum angle
       if (hypot(pt.z, pt.x) < distances[2]) {
         distances[2] = hypot(pt.z, pt.x);
