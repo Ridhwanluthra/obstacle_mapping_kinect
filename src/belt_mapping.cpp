@@ -71,7 +71,7 @@ void get_distance(const pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr& msg){
     double angle = atan2(pt.x, pt.z);
     cout<<angle<<endl;
     // std::cout<<i++<<endl;
-    if(angle < -center_threshold){
+    if(angle > center_threshold){
       // keep updating the minimum Distant point
       if (hypot(pt.z, pt.x) < distances[0]) {
         distances[0] = hypot(pt.z, pt.x);
@@ -85,7 +85,7 @@ void get_distance(const pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr& msg){
       }
     }
     
-    if(angle > center_threshold){
+    if(angle < -center_threshold){
       // keep updating the maximum angle
       if (hypot(pt.z, pt.x) < distances[2]) {
         distances[2] = hypot(pt.z, pt.x);

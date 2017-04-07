@@ -41,10 +41,10 @@ def callback(data):
         for i in range(3):
             if data.data[i] < 1:
                 print(directions[i])
-                # gc.switch_on(pins[i])
+                gc.switch_on(pins[i])
             else:
-                pass
-                # gc.switch_off(pins[i])
+                # pass
+                gc.switch_off(pins[i])
             sentence += directions[i] + ": " +str(round(data.data[i], 2)) + ", "
         sentence = sentence[:-2]
         print(sentence)
@@ -57,7 +57,7 @@ def callback(data):
 
     except Exception as e:
         print(e)
-        # gc.reset()
+        gc.reset()
 
 '''
 *
