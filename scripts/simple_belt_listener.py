@@ -14,7 +14,6 @@ import rospy
 from std_msgs.msg import String, Float64MultiArray, MultiArrayLayout, MultiArrayDimension
 import requests
 import math
-from numpy import inf
 
 right_pin = 6
 left_pin = 8
@@ -38,18 +37,6 @@ val = int()
 '''
 def callback(data):
     global sentence, val
-<<<<<<< Updated upstream
-    try:
-        for i in range(3):
-            if data.data[i] is inf:
-                data.data[i] = 0
-            if data.data[i] < 1:
-                print(directions[i])
-                gc.switch_on(pins[i])
-            else:
-                gc.switch_off(pins[i])
-            sentence += directions[i] + ": " +str(round(data.data[i], 2)) + ", "
-=======
     dat = list(data.data)
     try:
         for i in range(3):
@@ -62,7 +49,6 @@ def callback(data):
                 pass
                 gc.switch_off(pins[i])
             sentence += directions[i] + ": " +str(round(dat[i], 2)) + ", "
->>>>>>> Stashed changes
         sentence = sentence[:-2]
         print(sentence)
 
