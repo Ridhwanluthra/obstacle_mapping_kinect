@@ -29,8 +29,8 @@ direction = list()
 val = int()
 
 right_pin = 8
-left_pin = 7
-center_pin = 6
+left_pin = 6
+center_pin = 7
 
 '''
 *
