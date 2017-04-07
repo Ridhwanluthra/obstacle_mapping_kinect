@@ -43,7 +43,6 @@ def callback(data):
                 print(directions[i])
                 gc.switch_on(pins[i])
             else:
-                pass
                 gc.switch_off(pins[i])
             sentence += directions[i] + ": " +str(round(data.data[i], 2)) + ", "
         sentence = sentence[:-2]
