@@ -59,7 +59,7 @@ void get_distance(const pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr& msg){
   double rad_to_deg = 57.2958;
   rad_to_deg = 1;
 
-  float center_threshold = 0.5;
+  float center_threshold = 0.26;
 
   const double pi = boost::math::constants::pi<double>();
 
@@ -201,7 +201,7 @@ main (int argc, char** argv)
   voxel_pub = nh.advertise<sensor_msgs::PointCloud2> ("voxeled", 1);
 
   // publishing  details
-  arr_pub = nh.advertise<std_msgs::Float64MultiArray> ("cluster_distances", 10);
+  arr_pub = nh.advertise<std_msgs::Float64MultiArray> ("simple_distances", 10);
   // pub = 
 
   // Spin
