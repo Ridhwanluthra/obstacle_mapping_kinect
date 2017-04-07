@@ -96,11 +96,11 @@ void detect_wall(std::vector<pcl::PointIndices> cluster_indices, pcl::PointCloud
           rightmost_point[it] = pt;
         }
         // Check if point is topmost
-        if(((atan2(pt.y, pt.z))*rad_to_deg) > ((atan2(topmost_point[it].y, topmost_point[it].z))*rad_to_deg)){
+        if(((atan2(pt.y, pt.z))*rad_to_deg) < ((atan2(topmost_point[it].y, topmost_point[it].z))*rad_to_deg)){
           topmost_point[it] = pt;
         }
         // Check if point is bottommost
-        if(((atan2(pt.y, pt.z))*rad_to_deg) < ((atan2(topmost_point[it].y, topmost_point[it].z))*rad_to_deg)){
+        if(((atan2(pt.y, pt.z))*rad_to_deg) > ((atan2(topmost_point[it].y, topmost_point[it].z))*rad_to_deg)){
           bottommost_point[it] = pt;
         }
       }
@@ -117,7 +117,7 @@ void detect_wall(std::vector<pcl::PointIndices> cluster_indices, pcl::PointCloud
           cout << i << " STUPID CLUSTER" << endl;
           continue;
         }
-        // cout << i << " CHECKING" << endl;
+        cout << i << " CHECKING" << endl;
 
         // cout <<  ((atan2(pt.x, pt.z))*rad_to_deg) << "  " << ((atan2(leftmost_point[i].x, leftmost_point[i].z))*rad_to_deg)
         // << "  " << ((atan2(rightmost_point[i].x, rightmost_point[i].z))*rad_to_deg) << endl;
@@ -154,7 +154,7 @@ cloud_cb (const sensor_msgs::PointCloud2ConstPtr& input)
   // minClusterSize == Min number of points that should be there to form a cluster
 
   int minClusterSize = 100, maxClusterSize = 300, maxIterations = 150;
-  double leaf_size = 0.03, distanceThreshold = 0.01, clusterTolerance = 0.05;
+  double leaf_size = 1, distanceThreshold = 0.01, clusterTolerance = 0.05;
 
   pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud_f (new pcl::PointCloud<pcl::PointXYZRGB>);
   
@@ -176,96 +176,7 @@ cloud_cb (const sensor_msgs::PointCloud2ConstPtr& input)
   voxel_pub.publish(cloud_filtered_blob);
 
   pcl::fromPCLPointCloud2 (cloud_filtered_blob, *cloud_filtered);
-
-  // Create the segmentation object for the planar model and set all the parameters
-  pcl::SACSegmentation<pcl::PointXYZRGB> seg;
-  pcl::PointIndices::Ptr inliers (new pcl::PointIndices);
-  pcl::ModelCoefficients::Ptr coefficients (new pcl::ModelCoefficients);
-  pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud_plane (new pcl::PointCloud<pcl::PointXYZRGB> ());
-  pcl::PCDWriter writer;
-  seg.setOptimizeCoefficients (true);
-  seg.setModelType (pcl::SACMODEL_PLANE);
-  seg.setMethodType (pcl::SAC_RANSAC);
-  seg.setMaxIterations (maxIterations);
-  seg.setDistanceThreshold (distanceThreshold);
-
-  int i=0, nr_points = (int) cloud_filtered->points.size ();
-  while (cloud_filtered->points.size () > 0.3 * nr_points)
-  {
-    // Segment the largest planar component from the remaining cloud
-    seg.setInputCloud (cloud_filtered);
-    seg.segment (*inliers, *coefficients);
-    if (inliers->indices.size () == 0)
-    {
-      std::cout << "Could not estimate a planar model for the given dataset." << std::endl;
-      break;
-    }
-
-    // Extract the planar inliers from the input cloud
-    pcl::ExtractIndices<pcl::PointXYZRGB> extract;
-    extract.setInputCloud (cloud_filtered);
-    extract.setIndices (inliers);
-    // Remove the planar inliers, extract the rest
-    extract.setNegative (true);
-    extract.filter (*cloud_f);
-    *cloud_filtered = *cloud_f;
-  }
-
-  // Creating the KdTree object for the search method of the extraction
-  pcl::search::KdTree<pcl::PointXYZRGB>::Ptr tree (new pcl::search::KdTree<pcl::PointXYZRGB>);
-  tree->setInputCloud (cloud_filtered);
-
-  std::vector<pcl::PointIndices> cluster_indices;
-  pcl::EuclideanClusterExtraction<pcl::PointXYZRGB> ec;
-  ec.setClusterTolerance (clusterTolerance);
-  ec.setMinClusterSize (minClusterSize);
-  ec.setMaxClusterSize (maxClusterSize);
-  ec.setSearchMethod (tree);
-  ec.setInputCloud (cloud_filtered);
-  ec.extract (cluster_indices);
-  detect_wall(cluster_indices, cloud_filtered, *cloud_blob);
-
-  // pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud_clust_remove (new pcl::PointCloud<pcl::PointXYZRGB>);
-  // pcl::PCLPointCloud2 cloud_final;
-  // pcl::PCLPointCloud2 temp;
-  // *cloud_clust_remove = *cloud_filtered;
-  // pcl::PointCloud<pcl::PointXYZRGB> cloud_xyzrgb;
-  // // double range;
-  // std::cout<<"-------NEW FRAME------"<<std::endl<<std::endl;
-  // for (int it = 0; it < cluster_indices.size(); ++it)
-  // {
-  //   // Extract the planar inliers from the input cloud
-  //   pcl::ExtractIndices<pcl::PointXYZRGB> ext;
-  //   ext.setInputCloud (cloud_clust_remove);
-  //   ext.setIndices(boost::shared_ptr<pcl::PointIndices> (new pcl::PointIndices(cluster_indices[it])));
-  //   // to extract just the cluster
-  //   ext.setNegative (false);
-  //   ext.filter (*cloud_f);
-  //   // range = get_distance(cloud_f, j);
-  //   // // to ignore far away clusters for brevity.
-  //   // if (range >= maxDistance){
-  //   //   continue;
-  //   // }
-  //   cloud_xyzrgb = *cloud_f;
-
-  //   // iteratively colors the cluster red, green or blue.
-  //   for (size_t i = 0; i < cloud_xyzrgb.points.size(); i++) {
-  //     if (it % 3 == 0) {
-  //       cloud_xyzrgb.points[i].r = 255;
-  //     }
-  //     else if (it % 3 == 1) {
-  //       cloud_xyzrgb.points[i].g = 255;
-  //     }
-  //     else if (it % 3 == 2) {
-  //       cloud_xyzrgb.points[i].b = 255;  
-  //     }
-  //   }
-
-  //   pcl::toPCLPointCloud2 (cloud_xyzrgb, temp);
-  //   pcl::concatenatePointCloud(cloud_final, temp, cloud_final);
-  // }
-  j++;
-  // pub.publish (cloud_final);
+  convertToImage(cloud_filtered);
 }
 
 int

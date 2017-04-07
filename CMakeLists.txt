@@ -225,3 +225,6 @@ target_link_libraries(cluster_images ${catkin_LIBRARIES})
 
 add_executable(test_pcl src/test_pcl.cpp)
 target_link_libraries(test_pcl ${catkin_LIBRARIES})
+
+add_executable(convert_voxel src/convertVoxeltoImage.cpp)
+target_link_libraries(convert_voxel ${catkin_LIBRARIES})
