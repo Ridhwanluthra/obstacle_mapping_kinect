@@ -15,8 +15,8 @@ from std_msgs.msg import String, Float64MultiArray, MultiArrayLayout, MultiArray
 import requests
 import math
 
-right_pin = 8
-left_pin = 6
+right_pin = 6
+left_pin = 8
 center_pin = 7
 
 pins = [left_pin, center_pin, right_pin]
@@ -39,6 +39,8 @@ def callback(data):
     global sentence, val
     try:
         for i in range(3):
+            if data.data[i] is inf:
+                data.data[i] = 0
             if data.data[i] < 1:
                 print(directions[i])
                 gc.switch_on(pins[i])
@@ -81,4 +83,8 @@ def listener():
 
 # runs the listener function if the file is run as a script
 if __name__ == '__main__':
-    listener()
+    try:
+        listener()
+    except Exception as e:
+        print(e)
+        gc.reset()
