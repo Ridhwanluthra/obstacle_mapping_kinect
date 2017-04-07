@@ -14,6 +14,7 @@ import rospy
 from std_msgs.msg import String, Float64MultiArray, MultiArrayLayout, MultiArrayDimension
 import requests
 import math
+from numpy import inf
 
 right_pin = 6
 left_pin = 8
@@ -76,7 +77,7 @@ def listener():
     # anonymous=True flag means that rospy will choose a unique
     # name for our 'listener' node so that multiple listeners can
     # run simultaneously.
-    rospy.init_node('listener', anonymous=True)
+    rospy.init_node('simple_belt_listener', anonymous=True)
     rospy.Subscriber("simple_distances", Float64MultiArray, callback)
     # spin() simply keeps python from exiting until this node is stopped
     rospy.spin()

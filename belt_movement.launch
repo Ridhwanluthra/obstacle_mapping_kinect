@@ -1,0 +1,13 @@
+<launch>
+	<include file="$(find freenect_launch)/launch/freenect.launch" />
+	<node
+		name="belt_mapping"
+		pkg="obstacle_mapping"
+		type="belt_mapping"
+	/>
+	<node
+		name="simple_belt_listener"
+		pkg="obstacle_mapping"
+		type="simple_belt_listener.py"
+	/>
+</launch>
