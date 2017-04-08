@@ -46,7 +46,7 @@ ros::Publisher pub, arr_pub, voxel_pub;
 
 int j = 0;
 
-int maxDistance = 2;
+int maxDistance = 6;
 
 int minClusterSize = 100, maxClusterSize = 300, maxIterations = 150;
 double leaf_size = 0.03, distanceThreshold = 0.01, clusterTolerance = 0.05;
