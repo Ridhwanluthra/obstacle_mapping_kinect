@@ -217,8 +217,8 @@ target_link_libraries(cluster_distances ${catkin_LIBRARIES})
 add_executable(convert_pointcloud_to_image src/convert_pointcloud_to_image.cpp)
 target_link_libraries(convert_pointcloud_to_image ${catkin_LIBRARIES})
 
-add_executable(region_growing src/region_growing.cpp)
-target_link_libraries(region_growing ${catkin_LIBRARIES})
+#add_executable(region_growing src/region_growing.cpp)
+#target_link_libraries(region_growing ${catkin_LIBRARIES})
 
 add_executable(cluster_images src/cluster_images.cpp)
 target_link_libraries(cluster_images ${catkin_LIBRARIES})

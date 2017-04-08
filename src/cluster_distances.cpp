@@ -48,6 +48,9 @@ int j = 0;
 
 int maxDistance = 2;
 
+int minClusterSize = 100, maxClusterSize = 300, maxIterations = 150;
+double leaf_size = 0.03, distanceThreshold = 0.01, clusterTolerance = 0.05;
+
 double get_distance(const pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr& msg, int counter){
 /*
 *
@@ -209,8 +212,6 @@ cloud_cb (const sensor_msgs::PointCloud2ConstPtr& input)
 	// maxClusterSize == Max number of points that are allowed to cluster together.
 	// minClusterSize == Min number of points that should be there to form a cluster
 
-  int minClusterSize = 100, maxClusterSize = 300, maxIterations = 150;
-  double leaf_size = 0.03, distanceThreshold = 0.01, clusterTolerance = 0.05;
 
   pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud_f (new pcl::PointCloud<pcl::PointXYZRGB>);
   
@@ -330,10 +331,23 @@ main (int argc, char** argv)
   // Initialize ROS
   ros::init (argc, argv, "cluster_dist");
   ros::NodeHandle nh;
+  
+  ros::NodeHandle private_node_handle_("~");
+  /*
+	Example:
+	rosrun obstacle_mapping cluster_distances _clusterTolerance:=0.03 _minClusterSize:=150 _maxClusterSize:=250 _distanceThreshold:=0.02
+  */
+  private_node_handle_.param("minClusterSize", minClusterSize, int(5));
+  private_node_handle_.param("maxClusterSize", maxClusterSize, int(5));
+  // private_node_handle_.param("maxIterations", maxIterations, int(5));
+  private_node_handle_.param("distanceThreshold", distanceThreshold, double(5));
+  private_node_handle_.param("clusterTolerance", clusterTolerance, double(5));
+  // private_node_handle_.param("minClusterSize", minClusterSize, int(5));
+  cout << clusterTolerance << endl;
 
 
   // Create a ROS subscriber for the input point cloud
-  ros::Subscriber sub = nh.subscribe ("input", 1, cloud_cb);
+  ros::Subscriber sub = nh.subscribe ("/camera/depth_registered/points", 1, cloud_cb);
 
   // Create a ROS publisher for the output point cloud
   pub = nh.advertise<sensor_msgs::PointCloud2> ("output", 1);
