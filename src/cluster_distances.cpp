@@ -46,23 +46,13 @@ ros::Publisher pub, arr_pub, voxel_pub;
 
 int j = 0;
 
-int maxDistance = 6;
+int maxDistance = 2;
 
-int minClusterSize = 100, maxClusterSize = 300, maxIterations = 150;
+int minClusterSize = 100, maxClusterSize = 300, maxIterations = 100;
 double leaf_size = 0.03, distanceThreshold = 0.01, clusterTolerance = 0.05;
 
 double get_distance(const pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr& msg, int counter){
-/*
-*
-* Function Name:  get_distance
-* Input:    msg -> stores point cloud information to be processed
-            counter -> maintains the frame in consideration, necessary to handle clusters of same frame. 
-* Output:    Publishes the minimum distance to ROS publisher
-* Logic:    Iterates through all points in the filtered point cloud and publishes the min distance,
-*           its angles, its leftmost points distance and angles, its rightmost points distance and angles
-* Example Call:  get_distance (cloud, j)
-*
-*/
+
   double rad_to_deg = 57.2958;
   rad_to_deg = 1;
 
@@ -119,14 +109,15 @@ double get_distance(const pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr& msg, int 
   {
     std::cout<<"-------NEW CLUSTER------"<<std::endl;
     std::cout<<"MinDistance  "<<minDistance[0]<<"  ";
-    std::cout<<"MinAngleX  "<<minDistance[1]<<"  ";
-    std::cout<<"MinAngleY  "<<minDistance[2]<<std::endl;
-    std::cout<<"LeftDistance  "<<min_angle_radx[0]<<"  ";
+    // std::cout<<"MinAngleX  "<<minDistance[1]<<"  ";
+    // std::cout<<"MinAngleY  "<<minDistance[2]<<std::endl;
+    // std::cout<<"LeftDistance  "<<min_angle_radx[0]<<"  ";
     std::cout<<"LeftAngleX  "<<min_angle_radx[1]<<"  ";
-    std::cout<<"LeftAngleY  "<<min_angle_radx[2]<<std::endl;
-    std::cout<<"RightDistance  "<<max_angle_radx[0]<<"  ";
+    // std::cout<<"LeftAngleY  "<<min_angle_radx[2]<<std::endl;
+    // std::cout<<"RightDistance  "<<max_angle_radx[0]<<"  ";
     std::cout<<"RightAngleX  "<<max_angle_radx[1]<<"  ";
-    std::cout<<"RightAngleY  "<<max_angle_radx[2]<<std::endl;
+    std::cout<<"TopmostAngle  "<<max_angle_rady[2]<<"  ";
+    // std::cout<<"RightAngleY  "<<max_angle_radx[2]<<std::endl;
     std_msgs::Float64MultiArray arr;
 
     arr.data.clear();
@@ -168,43 +159,6 @@ double get_distance(const pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr& msg, int 
   return minDistance[0];
 }
 
-// void detect_wall(pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud_blob){
-//   BOOST_FOREACH (const pcl::PointXYZRGB& pt, msg->points){//to iterate trough all the points in the filtered point cloud published by publisher
-//     double maxDistance = 0.0;
-//     pcl::PointXYZRGB& maxPoint;
-//     if(hypot(pt.z, pt.x) > maxDistance){
-//       maxDistance = hypot(pt.z, pt.x);
-//       maxPoint = pt;
-//     }
-//   }
-//   BOOST_FOREACH (const pcl::PointXYZRGB& pt, msg->points){//to iterate trough all the points in the filtered point cloud published by publisher
-//     double maxDistance = 0.0;
-//     pcl::PointXYZRGB& maxPoint;
-//     if (hypot(pt.z, pt.x) > maxDistance){
-//       maxDistance = hypot(pt.z, pt.x);
-//       maxPoint = pt;
-//     }
-//   }
-
-// }
-
-
-
-/*
-*
-* Function Name:  cloud_cb
-* Input:    input -> A point cloud to work on 
-* Output:   Publishes the clustered point cloud and the distances of them.
-* Logic:    first a voxelgrid filter is applied to make the cloud less dense.
-*           then Sac segmentation is done using ransac model to extract the planes
-*           Then using extractIndices the point cloud without the floor plane is extracted.
-*           then eucledian clustering is executed to find clusters
-*           the various clusters are then concatinated and then published, this also removes outliers
-*           for each cluster the teh get_distance() function is called which produces useful information
-*           about each of the clusters.
-* Example Call: Callback function. Manual calling not required 
-*
-*/
 void 
 cloud_cb (const sensor_msgs::PointCloud2ConstPtr& input)
 {
@@ -338,6 +292,7 @@ main (int argc, char** argv)
 	rosrun obstacle_mapping cluster_distances _clusterTolerance:=0.03 _minClusterSize:=150 _maxClusterSize:=250 _distanceThreshold:=0.02
   */
   private_node_handle_.param("minClusterSize", minClusterSize, int(5));
+  private_node_handle_.param("leaf_size", leaf_size, double(5));
   private_node_handle_.param("maxClusterSize", maxClusterSize, int(5));
   // private_node_handle_.param("maxIterations", maxIterations, int(5));
   private_node_handle_.param("distanceThreshold", distanceThreshold, double(5));
