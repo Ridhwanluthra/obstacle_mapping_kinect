@@ -1,14 +1,13 @@
 <launch>
 	<include file="$(find freenect_launch)/launch/freenect.launch" />
 	<node
-		name="cluster_dist"
+		name="get_dists"
 		pkg="obstacle_mapping"
-		type="cluster_distances"
-		args="input:=/camera/depth_registered/points"
+		type="belt_mapping"
 	/>
 	<node
 		name="listener"
 		pkg="obstacle_mapping"
-		type="listener"
+		type="simple_belt_listener"
 	/>
 </launch>

@@ -12,7 +12,7 @@
 # import gpio_control as gc
 import rospy
 from std_msgs.msg import String, Float64MultiArray, MultiArrayLayout, MultiArrayDimension
-import requests
+# import requests
 import math
 
 right_pin = 6
@@ -22,9 +22,9 @@ center_pin = 7
 pins = [left_pin, center_pin, right_pin]
 directions = ['left', 'center', 'right']
 
-sentence = ""
+# sentence = ""
 
-val = int()
+# val = int()
 
 '''
 *
@@ -36,7 +36,7 @@ val = int()
 *
 '''
 def callback(data):
-    global sentence, val
+    # global sentence, val
     dat = list(data.data)
     try:
         for i in range(3):
@@ -48,15 +48,15 @@ def callback(data):
             else:
                 pass
                 # gc.switch_off(pins[i])
-            sentence += directions[i] + ": " +str(round(dat[i], 2)) + ", "
-        sentence = sentence[:-2]
-        print(sentence)
+            # sentence += directions[i] + ": " +str(round(dat[i], 2)) + ", "
+        # sentence = sentence[:-2]
+        # print(sentence)
 
-        r = requests.get("http://www.lithics.in/apis/eyic/getStatus.php")
-        if val != int(r.content):
-            rp = requests.post("http://www.lithics.in/apis/eyic/firebase.php", data={'message':sentence})
-        val = int(r.content)
-        sentence = ""
+        # r = requests.get("http://www.lithics.in/apis/eyic/getStatus.php")
+        # if val != int(r.content):
+        #     rp = requests.post("http://www.lithics.in/apis/eyic/firebase.php", data={'message':sentence})
+        # val = int(r.content)
+        # sentence = ""
 
     except Exception as e:
         print(e)
