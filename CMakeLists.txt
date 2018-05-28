@@ -202,26 +202,11 @@ include_directories(
 ## Add folders to be run by python nosetests
 # catkin_add_nosetests(test)
 
-add_executable(cluster_distances src/cluster_distances.cpp)
-target_link_libraries(cluster_distances ${catkin_LIBRARIES})
+add_executable(cluster_extraction src/cluster_extraction.cpp)
+target_link_libraries(cluster_extraction ${catkin_LIBRARIES})
 
-#add_executable(cluster_extraction src/cluster_extraction.cpp)
-#target_link_libraries(cluster_extraction ${catkin_LIBRARIES})
+add_executable(remove_floor src/remove_floor.cpp)
+target_link_libraries(remove_floor ${catkin_LIBRARIES})
 
-#add_executable(find_min_distance src/find_min_distance.cpp)
-#target_link_libraries(find_min_distance ${catkin_LIBRARIES})
-
-#add_executable(remove_floor src/remove_floor.cpp)
-#target_link_libraries(remove_floor ${catkin_LIBRARIES})
-
-add_executable(convert_pointcloud_to_image src/convert_pointcloud_to_image.cpp)
-target_link_libraries(convert_pointcloud_to_image ${catkin_LIBRARIES})
-
-#add_executable(region_growing src/region_growing.cpp)
-#target_link_libraries(region_growing ${catkin_LIBRARIES})
-
-add_executable(cluster_images src/cluster_images.cpp)
-target_link_libraries(cluster_images ${catkin_LIBRARIES})
-
-add_executable(test_pcl src/test_pcl.cpp)
-target_link_libraries(test_pcl ${catkin_LIBRARIES})
+add_executable(cylinder_segment src/cylinder_segment.cpp)
+target_link_libraries(cylinder_segment ${catkin_LIBRARIES})
