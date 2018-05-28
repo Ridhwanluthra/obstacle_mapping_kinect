@@ -1,14 +1,14 @@
 <launch>
-	<include file="$(find freenect_launch)/launch/freenect.launch" />
+	<!-- <include file="$(find openni_launch)/launch/openni.launch" /> -->
 	<node
 		name="cluster_dist"
 		pkg="obstacle_mapping"
-		type="cluster_distances"
+		type="remove_floor"
 		args="input:=/camera/depth_registered/points"
 	/>
-	<node
+	<!-- <node
 		name="listener"
 		pkg="obstacle_mapping"
 		type="listener"
-	/>
+	/> -->
 </launch>
