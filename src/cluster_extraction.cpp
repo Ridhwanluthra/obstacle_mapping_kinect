@@ -44,33 +44,24 @@ ros::Publisher pub;
 * Example Call: Callback function. Manual calling not required. 
 *
 */
-void 
-cloud_cb (const sensor_msgs::PointCloud2ConstPtr& input)
-{
-  //variable declarations
-  pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud_f (new pcl::PointCloud<pcl::PointXYZRGB>);
-  
-  pcl::PCLPointCloud2* cloud_blob = new pcl::PCLPointCloud2; 
-  pcl::PCLPointCloud2ConstPtr cloudPtr(cloud_blob);
-  pcl::PCLPointCloud2 cloud_filtered_blob;
-
-  pcl_conversions::toPCL(*input, *cloud_blob);
-
-  pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud_filtered (new pcl::PointCloud<pcl::PointXYZRGB>);
+void cloud_cb (const pcl::PCLPointCloud2ConstPtr& cloud)
+{  
   // this is the voxel grid filtering
   // Create the filtering object: downsample the dataset using a leaf size of 1cm
+  pcl::PCLPointCloud2 cloud_voxeled;
   pcl::VoxelGrid<pcl::PCLPointCloud2> sor;
-  sor.setInputCloud (cloudPtr);
-  sor.setLeafSize (0.05, 0.05, 0.05);
-  sor.filter (cloud_filtered_blob);
+  sor.setInputCloud (cloud);
+  sor.setLeafSize (0.01, 0.01, 0.01);
+  sor.filter (cloud_voxeled);
 
-  pcl::fromPCLPointCloud2 (cloud_filtered_blob, *cloud_filtered);
+  pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud_filtered (new pcl::PointCloud<pcl::PointXYZRGB>);
+  pcl::fromPCLPointCloud2 (cloud_voxeled, *cloud_filtered);
 
   // Create the segmentation object for the planar model and set all the parameters
   pcl::SACSegmentation<pcl::PointXYZRGB> seg;
   pcl::PointIndices::Ptr inliers (new pcl::PointIndices);
   pcl::ModelCoefficients::Ptr coefficients (new pcl::ModelCoefficients);
-  pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud_plane (new pcl::PointCloud<pcl::PointXYZRGB> ());
+  
   seg.setOptimizeCoefficients (true);
   seg.setModelType (pcl::SACMODEL_PLANE);
   seg.setMethodType (pcl::SAC_RANSAC);
@@ -78,6 +69,7 @@ cloud_cb (const sensor_msgs::PointCloud2ConstPtr& input)
   seg.setDistanceThreshold (0.02);
 
   int i=0, nr_points = (int) cloud_filtered->points.size ();
+  // while 30% of the cloud is there
   while (cloud_filtered->points.size () > 0.3 * nr_points)
   {
     // Segment the largest planar component from the remaining cloud
@@ -93,16 +85,9 @@ cloud_cb (const sensor_msgs::PointCloud2ConstPtr& input)
     pcl::ExtractIndices<pcl::PointXYZRGB> extract;
     extract.setInputCloud (cloud_filtered);
     extract.setIndices (inliers);
-    extract.setNegative (false);
-
-    // Get the points associated with the planar surface
-    extract.filter (*cloud_plane);
-    std::cout << "PointCloud representing the planar component: " << cloud_plane->points.size () << " data points." << std::endl;
-
     // Remove the planar inliers, extract the rest
     extract.setNegative (true);
-    extract.filter (*cloud_f);
-    *cloud_filtered = *cloud_f;
+    extract.filter (*cloud_filtered);
   }
 
   // Creating the KdTree object for the search method of the extraction
@@ -114,37 +99,28 @@ cloud_cb (const sensor_msgs::PointCloud2ConstPtr& input)
   pcl::EuclideanClusterExtraction<pcl::PointXYZRGB> ec;
   ec.setClusterTolerance (0.05); // 2cm
   ec.setMinClusterSize (100);
-  ec.setMaxClusterSize (25000);
+  ec.setMaxClusterSize (250);
   ec.setSearchMethod (tree);
   ec.setInputCloud (cloud_filtered);
   ec.extract (cluster_indices);
 
-  int j = 0;
-  ROS_INFO_STREAM("--------NEW FRAME ACQUIRED---------" << "\n");
-  pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud_clust_remove (new pcl::PointCloud<pcl::PointXYZRGB>);
+
   pcl::PCLPointCloud2 cloud_final;
   pcl::PCLPointCloud2 temp;
-  *cloud_clust_remove = *cloud_filtered;
   pcl::PointCloud<pcl::PointXYZRGB> cloud_xyzrgb;
   for (int it = 0; it < cluster_indices.size(); ++it)
   {
     // Extract the planar inliers from the input cloud
     pcl::ExtractIndices<pcl::PointXYZRGB> ext;
-    ext.setInputCloud (cloud_clust_remove);
+    ext.setInputCloud (cloud_filtered);
     ext.setIndices(boost::shared_ptr<pcl::PointIndices> (new pcl::PointIndices(cluster_indices[it])));
     ext.setNegative (false);
-    ext.filter (*cloud_f);
-    cloud_xyzrgb = *cloud_f;
-
- //    for (size_t i = 0; i < cloud_xyzrgb.points.size(); i++) {
- //    	cloud_xyzrgb.points[i].r = 255;
-	// }
+    ext.filter (cloud_xyzrgb);
 
     pcl::toPCLPointCloud2 (cloud_xyzrgb, temp);
     pcl::concatenatePointCloud(cloud_final, temp, cloud_final);
   }
   pub.publish (cloud_final);
-  ROS_INFO_STREAM("--------FOR LOOP ENDS---------" << "\n");
 }
 
 int
